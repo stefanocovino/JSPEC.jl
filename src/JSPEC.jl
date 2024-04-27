@@ -20,7 +20,7 @@ Returns the instruments currently supported by the JSPEC package.
 
 
 # Examples
-```jldoctest
+```julia
 @show GetKnownInstruments()
 ```
 """
