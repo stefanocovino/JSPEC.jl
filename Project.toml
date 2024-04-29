@@ -1,7 +1,7 @@
 name = "JSPEC"
 uuid = "799228a4-d83e-4675-bef0-fa04f023a533"
 authors = ["Stefano Covino <stefano.covino@inaf.it> and contributors"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
@@ -12,6 +12,7 @@ LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [compat]
 FITSIO = "0.17"
+CairoMakie = "0.11"
 julia = "1.9"
 
 [extras]
