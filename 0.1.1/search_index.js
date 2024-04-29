@@ -1,0 +1,3 @@
+var documenterSearchIndex = {"docs":
+[{"location":"","page":"Home","title":"Home","text":"CurrentModule = JSPEC","category":"page"},{"location":"#JSPEC","page":"Home","title":"JSPEC","text":"","category":"section"},{"location":"","page":"Home","title":"Home","text":"Documentation for JSPEC.","category":"page"},{"location":"","page":"Home","title":"Home","text":"","category":"page"},{"location":"","page":"Home","title":"Home","text":"Modules = [JSPEC]","category":"page"},{"location":"#JSPEC.GetKnownInstruments-Tuple{}","page":"Home","title":"JSPEC.GetKnownInstruments","text":"GetKnownInstruments()\n\nReturns the instruments currently supported by the JSPEC package.\n\nExamples\n\n@show GetKnownInstruments()\n\n\n\n\n\n","category":"method"}]
+}
