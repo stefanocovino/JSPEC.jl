@@ -29,3 +29,25 @@ Documentation for the package and use examples can be found [here](https://stefa
 ### Similar tools
 
 If you are interested in similar capabilities you may also check the "[SpectralFitting.jl](https://github.com/fjebaker/SpectralFitting.jl?tab=readme-ov-file)" and "[LibXSPEC_jll.jl](https://github.com/astro-group-bristol/LibXSPEC_jll.jl)".
+
+
+## Getting Started
+
+The purpose of the package is to provide tools to mode data from multi-channel instruments togeter, if needed, with data from any other surce. The package compute the needed response matrces that can then used for cretig models, carry out fits, etc.
+
+No attept has been tried, on purpose, to mimic the simplified XSPEC syntax to create models, etc.
+
+The instruments currently covered can be obtained with:
+
+ˆˆˆjulia
+GetKnownInstruments()
+ˆˆˆ
+
+Ad the first step is to create a new dataset. For instance, assuming we want to model 'Swift-XRT' data and data from an optical telescope, we might write:
+
+ˆˆˆjulia
+XRTdt = CreateDataSet("XRTdata","Swift-XRT")
+Optdt = CreateDataSet("Optdata","Other")
+ˆˆˆ
+
+'XRTdt' and 'Optdt' are dictionaris that are going to include all the needed information.
