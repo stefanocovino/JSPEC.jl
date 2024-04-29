@@ -29,9 +29,10 @@ newdataset = CreateDataSet("XRTTest","Swift-XRT")
 
 # output
 
-JSPECDataSet(
-    Instrument::String = Swift-XRT, 
-    Name::String = XRTTest, 
+Dict{Any, Any} with 3 entries:
+  "Name"       => "XRTTest"
+  "Instrument" => "Swift-XRT"
+  "Created"    => true
 )
 ```
 """

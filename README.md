@@ -39,15 +39,15 @@ No attept has been tried, on purpose, to mimic the simplified XSPEC syntax to cr
 
 The instruments currently covered can be obtained with:
 
-ˆˆˆjulia
+```julia
 GetKnownInstruments()
-ˆˆˆ
+```
 
 Ad the first step is to create a new dataset. For instance, assuming we want to model 'Swift-XRT' data and data from an optical telescope, we might write:
 
-ˆˆˆjulia
+```julia
 XRTdt = CreateDataSet("XRTdata","Swift-XRT")
 Optdt = CreateDataSet("Optdata","Other")
-ˆˆˆ
+```
 
 'XRTdt' and 'Optdt' are dictionaris that are going to include all the needed information.
