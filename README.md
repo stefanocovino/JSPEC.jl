@@ -51,3 +51,10 @@ Optdt = CreateDataSet("Optdata","Other")
 ```
 
 'XRTdt' and 'Optdt' are dictionaris that are going to include all the needed information.
+
+Assuming we have the following 'ex.rmf', 'ex.arf', 'exsrc.pi' and 'exbck.pi' XRT files we can import them as follows:
+
+```julia
+ImportData("XRTdata", rmffile="ex.rmf", arffile="ex.arf", srcfile="exsrc.pi", bckfile="exbck.pi")
+```
+

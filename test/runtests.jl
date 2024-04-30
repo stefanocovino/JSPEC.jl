@@ -9,7 +9,7 @@ using Test
     #
     # ImportData
     frmf = joinpath("testdata","xrtwt.rmf")
-    farff = joinpath("testdata","xrtwt.arf")
+    farf = joinpath("testdata","xrtwt.arf")
     fsrc = joinpath("testdata","xrtwtsource.pi")
     fbck = joinpath("testdata","xrtwtback.pi")
     ImportData(newdt, rmffile=frmf, arffile=farf, srcfile=fsrc, bckfile=fbck)
