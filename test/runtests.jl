@@ -5,7 +5,7 @@ using Test
     # Write your tests here.
     # CreateDataSet
     newdt = CreateDataSet("XRTTest","Swift-XRT")
-    @test newdt["Instrument"] == "Swift.XRT" 
+    @test newdt["Instrument"] == "Swift-XRT" 
     #
     # ImportData
     frmf = joinpath("testdata","xrtwt.rmf")
