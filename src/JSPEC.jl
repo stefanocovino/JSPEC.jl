@@ -11,6 +11,7 @@ using LinearAlgebra
 export CreateDataSet
 export GetKnownInstruments
 export ImportData
+export ImportOtherData
 
 
 KnownInstruments = ["Swift-XRT", "Swift-BAT", "SVOM-MXT", "Other"]
@@ -188,6 +189,39 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
         ds["ImportedData"] = true
     end
 end
+
+
+
+"""
+    ImportOtherData(ds::Dict, energy, phflux, ephflux; bandwidth=1., verbose=true)
+
+Import data already in physical units, 'ds' is a JEPC dictionary, 'energy' is KeV, 'phflux' is the corresponding photon flux density in photons cm^-2 s^-1 KeV^-1 and 'ephflux' the uncertainty. In case it is a photon flux (photons cm^-2 s^-1) the with, in KeV, of the band, 'bandwidth' must be provided.
+
+# Examples
+```julia
+ImportOtherData(newdataset, [1.,2.,3.,4], [0.1,0.2,0.3,0.4], [0.01,0.02,0.03,0.04])
+```
+"""
+function ImportOtherData(ds::Dict, energy, phflux, ephflux; bandwidth=1., verbose=true)
+    if haskey(ds,"Created") && !ds["Created"]
+        if verbose
+            println("Warning! Dataset not created yet.")
+        end
+    elseif uppercase(ds["Instrument"]) == uppercase("Other")
+        ds["Energy"] = energy
+        ds["PhFlux"] = phflux
+        ds["PhFluxErr"] = ephflux        
+        ds["BandWidth"] = bandwidth
+        ds["RMF"] = I
+        ds["ImportedData"] = true
+    else
+        if verbose
+            println("This function can be used only for data declared as 'Other'.")
+        end
+        ds["ImportedData"] = false
+    end
+end
+
 
 
 
