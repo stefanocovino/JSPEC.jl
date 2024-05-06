@@ -12,6 +12,7 @@ export CreateDataSet
 export GetKnownInstruments
 export ImportData
 export ImportOtherData
+export PlotRaw
 
 
 KnownInstruments = ["Swift-XRT", "Swift-BAT", "SVOM-MXT", "Other"]
@@ -22,7 +23,7 @@ KnownInstruments = ["Swift-XRT", "Swift-BAT", "SVOM-MXT", "Other"]
 """
     CreateDataSet(Name::String, Instrument::String; verbose=true)::Dict
 
-Create JSPECDataSent entry. 'Name' is the arbitrary name of the dataset one may choose and 'Instrument' is one of supperted instrument by the package.
+Create JSPECDataSent entry. 'Name' is the arbitrary name of the dataset one may choose and 'Instrument' is one of supperted instrument by the package. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
 
 
 # Examples
@@ -79,7 +80,8 @@ end
 """
     ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::String="", bckfile::String="", verbose=true)
 
-Import data from "multi-channel" instruments (e.g., Swift-XRT) as FITS files and add fields to the JSPECDataSet dictionary. 'ds' is the JSPEC data set dictionary, 'rmfile' is the RMF response matrix, 'arffile' the effective area matrix, 'srcfile' the counts (or rates) for the source, and 'bckfile' the counts or rates for the background.
+Import data from "multi-channel" instruments (e.g., Swift-XRT) as FITS files and add fields to the JSPECDataSet dictionary. 'ds' is the JSPEC data set dictionary, 'rmfile' is the RMF response matrix, 'arffile' the effective area matrix, 'srcfile' the counts (or rates) for the source, and 'bckfile' the counts or rates for the background. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
+
 
 # Examples
 
@@ -195,7 +197,8 @@ end
 """
     ImportOtherData(ds::Dict, energy, phflux, ephflux; bandwidth=1., verbose=true)
 
-Import data already in physical units, 'ds' is a JEPC dictionary, 'energy' is KeV, 'phflux' is the corresponding photon flux density in photons cm^-2 s^-1 KeV^-1 and 'ephflux' the uncertainty. In case it is a photon flux (photons cm^-2 s^-1) the with, in KeV, of the band, 'bandwidth' must be provided.
+Import data already in physical units, 'ds' is a JEPC dictionary, 'energy' is KeV, 'phflux' is the corresponding photon flux density in photons cm^-2 s^-1 KeV^-1 and 'ephflux' the uncertainty. In case it is a photon flux (photons cm^-2 s^-1) the with, in KeV, of the band, 'bandwidth' must be provided. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
+
 
 # Examples
 ```julia
@@ -221,6 +224,48 @@ function ImportOtherData(ds::Dict, energy, phflux, ephflux; bandwidth=1., verbos
         ds["ImportedData"] = false
     end
 end
+
+
+
+
+"""
+    PlotRaw(ds:Dict; xlbl="Channels", ylbl="Counts", tlbl=ds.Name, verbose=true)::Figure
+
+Draw a plot of the raw input data. 'ds' is the JSPEC data set dictionary, 'xlbl' and 'ylbl' are the labels for the x and y axes, whule 'tlbl' is the plot title. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
+
+
+# Examples
+```julia
+figraw = PlotRaw(newdataset)
+```
+"""
+function PlotRaw(ds::Dict; xlbl="Channels", ylbl=L"Counts ch$^{-1}$", tlbl=ds["Name"], verbose=true)::Figure
+    fig = Figure(fontsize=30)    
+    #
+    ax = Axis(fig[1, 1],
+        spinewidth=3,
+        xlabel = xlbl,
+        ylabel = ylbl,
+        title = tlbl,
+        #yscale=log10,
+        #xscale=log10,
+        )
+    if !ds["ImportedData"]
+        if verbose
+            println("Warning! Data not imported yet.")
+        end
+    elseif uppercase(ds["Instrument"]) == uppercase("Other")
+        scatter!(ds["Energy"],ds["PhFlux"],color=(:orange,0.2))
+        errorbars!(ds["Energy"],ds["PhFlux"],ds["PhFluxErr"],color=(:orange,0.2))        
+    else
+        scatter!(ds["ChanNumber"],ds["InputData"],color=(:orange,0.2))
+        errorbars!(ds["ChanNumber"],ds["InputData"],ds["InputDataErr"],color=(:orange,0.2))
+    end
+    #
+    return fig
+end
+
+
 
 
 

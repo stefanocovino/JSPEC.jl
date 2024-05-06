@@ -55,13 +55,25 @@ Optdt = CreateDataSet("Optdata","Other")
 Assuming we have the following 'ex.rmf', 'ex.arf', 'exsrc.pi' and 'exbck.pi' XRT files we can import them as follows:
 
 ```julia
-ImportData("XRTdata", rmffile="ex.rmf", arffile="ex.arf", srcfile="exsrc.pi", bckfile="exbck.pi")
+ImportData(XRTdt, rmffile="ex.rmf", arffile="ex.arf", srcfile="exsrc.pi", bckfile="exbck.pi")
 ```
 
 Optical data, but also data from any other source where a non-diagonal response matrix is not needed, should be converted to energy, in KeV, and photon flux density in photons cm$^-2£ s$^-1$ KeV$^-1$. Alternatively, data can be represented by flux but in suich a case the bandwidth, again in KeV, must be provided too.
 
 ```julia
-ImportOtherData(newdataset, energy=[1.,2.,3.,4], phflux=[0.1,0.2,0.3,0.4], ephflux=[0.01,0.02,0.03,0.04])
+ImportOtherData(Optdt, energy=[1.,2.,3.,4], phflux=[0.1,0.2,0.3,0.4], ephflux=[0.01,0.02,0.03,0.04])
 ```
+
+It is possible to visualize the imported data with, e.g.:
+```julia
+PlotRaw(XRTdt)
+```
+
+or:
+```julia
+PlotRaw(Optdt,ylbl=L"Photons s$^{-1}$ cm$^{-2}$ KeV$^{-1}$")
+```
+
+
 
 

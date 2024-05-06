@@ -1,3 +1,4 @@
+using CairoMakie
 using JSPEC
 using Test
 
@@ -19,5 +20,8 @@ using Test
     newodt = CreateDataSet("OptData","Other")
     ImportOtherData(newodt, [1.,2.,3.,4], [0.1,0.2,0.3,0.4], [0.01,0.02,0.03,0.04])
     @test newodt["ImportedData"] == true
+    #
+    # PlotRaw
+    @test typeof(PlotRaw(newdt)) == Figure
     #
 end
