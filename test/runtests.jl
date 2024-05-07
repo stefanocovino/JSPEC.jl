@@ -24,4 +24,8 @@ using Test
     # PlotRaw
     @test typeof(PlotRaw(newdt)) == Figure
     #
+    # IgnoreChannels
+    IgnoreChannels(newdt,[0,1,2,3])
+    @test newdt["IgnoredChannels"] == true
+    #
 end

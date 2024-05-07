@@ -74,6 +74,13 @@ or:
 PlotRaw(Optdt,ylbl=L"Photons s$^{-1}$ cm$^{-2}$ KeV$^{-1}$")
 ```
 
+Often, for multi-channel instruments, channels can (or need to be) ignored. This can be achieved with, e.g.:
+
+```julia
+IgnoreChannels(XRTdt,[0:30,1000:2047])
+```
+
+
 
 
 

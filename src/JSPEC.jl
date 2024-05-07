@@ -10,6 +10,7 @@ using LinearAlgebra
 
 export CreateDataSet
 export GetKnownInstruments
+export IgnoreChannels
 export ImportData
 export ImportOtherData
 export PlotRaw
@@ -74,6 +75,55 @@ Returns the instruments currently supported by the JSPEC package.
 function GetKnownInstruments()
     return KnownInstruments
 end
+
+
+
+
+"""
+    IgnoreChannels(ds:Dict, chns; verbose=true)
+
+Ignore channels in the input data. 'ds' is the JSPEC data set dictionary, 'chns' is a vector of channels to be ignored, e.g. [0,1,2,3] or even [0:4, 1000:1023]. Please remeber that channel numebering starts with 0. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
+
+
+# Examples
+```julia
+IgnoreChannels(newdataset,[0,1,2,3])
+```
+"""
+function IgnoreChannels(ds::Dict,chns; verbose=true)
+    if !ds["ImportedData"]
+        if verbose
+            println("Warning! Data not imported yet.")
+        end
+    elseif uppercase(ds["Instrument"]) == uppercase("Other")
+        if verbose
+            println("Warning! Data are not from a multi-channel instrument.")
+        end        
+    else
+        mask = ones(Bool, length(ds["InputData"]))
+        for e in chns
+            mask[intersect(1:end, e .+ 1)] .= false
+        end
+        ds["MaskedInputData"] = ds["InputData"][mask]
+        ds["MaskedInputDataErr"] = ds["InputDataErr"][mask]
+        if uppercase(ds["Instrument"]) == uppercase("Swift-XRT")
+            ds["MaskedInputSrcData"] = ds["InputSrcData"][mask]
+            ds["MaskedInputBckData"] = ds["InputBckDataCorr"][mask]
+        end
+        #ds["MaskedChanNumber"] = ds["ChanNumber"][mask]
+        #
+        ds["MaskedChannels"] = copy(ds["Channels"])
+        deleteat!(ds["MaskedChannels"],findall(iszero,mask))
+        ds["MaskedChannels"][!,"CHANNEL"] .= 0:nrow(ds["MaskedChannels"])-1
+        #
+        ds["MaskedRMF"] = copy(ds["RMF"])
+        for i in 1:nrow(ds["RMF"])
+            ds["MaskedRMF"][i,"MATRIX"] = ds["RMF"][i,"MATRIX"][mask]
+        end
+        ds["IgnoredChannels"] = true
+    end
+end
+
 
 
 
