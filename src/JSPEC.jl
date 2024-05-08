@@ -2,6 +2,7 @@ module JSPEC
 
 using CairoMakie
 using DataFrames
+using FittingFunction
 using FITSIO
 using LaTeXStrings
 using LinearAlgebra
