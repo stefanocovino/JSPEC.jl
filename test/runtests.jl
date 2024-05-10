@@ -28,4 +28,7 @@ using Test
     IgnoreChannels(newdt,[0,1,2,3])
     @test newdt["IgnoredChannels"] == true
     #
+    # GenRebin
+    @test GenRebin([1.,2.,3.,4.],[1,3,4]) == [1.0,2.5,4.0]
+    #
 end

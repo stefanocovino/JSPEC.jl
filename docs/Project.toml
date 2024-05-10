@@ -1,3 +1,4 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+FittingFunction = "7c8a6357-aefd-4570-aae0-a8cd991d38f9"
 JSPEC = "799228a4-d83e-4675-bef0-fa04f023a533"

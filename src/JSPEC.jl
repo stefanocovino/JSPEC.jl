@@ -10,6 +10,7 @@ using LinearAlgebra
 
 
 export CreateDataSet
+export GenRebin
 export GetKnownInstruments
 export IgnoreChannels
 export ImportData
@@ -59,6 +60,41 @@ end
 
 
 
+"""
+    GenRebin(x,rebs)::AbstractVector{Real}
+
+Rebin input data following a given rebin schema.
+
+
+# Examples
+```jldoctest
+
+x = [1.,2.,3.,4.,]
+rbs = [1,3,4]
+
+GenRebin(x,rbs)
+
+# output
+
+3-element Vector{Real}:
+ 1.0
+ 2.5
+ 4.0
+
+```
+"""
+function GenRebin(x,rebs)::AbstractVector{Real}
+    newa = zeros(Real,length(rebs))
+    old = 1
+    for l in enumerate(rebs)
+        newa[l[1]] = sum(x[old:l[2]])/Float64(length(x[old:l[2]]))
+        old = l[2]+1
+    end
+    return newa
+end
+
+
+
 
 
 
@@ -76,6 +112,8 @@ Returns the instruments currently supported by the JSPEC package.
 function GetKnownInstruments()
     return KnownInstruments
 end
+
+
 
 
 
