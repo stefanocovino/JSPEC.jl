@@ -6,7 +6,7 @@ using Test
     # Write your tests here.
     # CreateDataSet
     newdt = CreateDataSet("XRTTest","Swift-XRT")
-    @test newdt["Instrument"] == "Swift-XRT" 
+    @test newdt["Instrument"] == "Swift-XRT"
     #
     # ImportData
     frmf = joinpath("testdata","xrtwt.rmf")
@@ -28,7 +28,14 @@ using Test
     IgnoreChannels(newdt,[0,1,2,3])
     @test newdt["IgnoredChannels"] == true
     #
+    # FindRebinSchema
+    @test JSPEC.FindRebinSchema([1.,2.,3.,4.,],[0.1,0.5,0.6,0.05]) == [1, 3, 4]
+    #
     # GenRebin
-    @test GenRebin([1.,2.,3.,4.],[1,3,4]) == [1.0,2.5,4.0]
+    @test JSPEC.GenRebin([1.,2.,3.,4.],[1,3,4]) == [1.0,2.5,4.0]
+    #
+    # RebinData
+    RebinData(newdt)
+    @test newdt["RebinnedData"] == true
     #
 end

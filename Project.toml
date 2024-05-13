@@ -1,13 +1,12 @@
 name = "JSPEC"
 uuid = "799228a4-d83e-4675-bef0-fa04f023a533"
 authors = ["Stefano Covino <stefano.covino@inaf.it> and contributors"]
-version = "0.7.0"
+version = "0.8.0"
 
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 FITSIO = "525bcba6-941b-5504-bd06-fd0dc1a4d2eb"
-FittingFunction = "7c8a6357-aefd-4570-aae0-a8cd991d38f9"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
@@ -17,7 +16,6 @@ DataFrames = "1"
 FITSIO = "0.17"
 LaTeXStrings = "1"
 julia = "1.9"
-FittingFunction = "0.8.0"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

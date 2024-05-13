@@ -2,7 +2,6 @@ module JSPEC
 
 using CairoMakie
 using DataFrames
-using FittingFunction
 using FITSIO
 using LaTeXStrings
 using LinearAlgebra
@@ -10,12 +9,13 @@ using LinearAlgebra
 
 
 export CreateDataSet
-export GenRebin
 export GetKnownInstruments
 export IgnoreChannels
 export ImportData
 export ImportOtherData
 export PlotRaw
+export RebinData
+
 
 
 KnownInstruments = ["Swift-XRT", "Swift-BAT", "SVOM-MXT", "Other"]
@@ -60,6 +60,53 @@ end
 
 
 
+
+
+
+
+"""
+    FindRebinSchema(x,ey;minSN=5)::AbstractVector{Real}
+
+Compute the rebin schema to guarantee that the S/N is at least 'minSN' in each bin (or channel). 'x' and 'ex' are the input data and relative uncertainties.
+
+# Examples
+```jldoctest
+
+x = [1.,2.,3.,4.,]
+ex = [0.1,0.5,0.6,0.05]
+
+JSPEC.FindRebinSchema(x,ex)
+
+# output
+
+3-element Vector{Real}:
+ 1
+ 3
+ 4
+
+```
+"""
+function FindRebinSchema(x::AbstractVector{Float64},ex::AbstractVector{Float64};minSN=5)::AbstractVector{Real}
+    sbin = []
+    i = 1
+    while i <= length(x)
+        for l in i:length(x)
+            c = sum(x[i:l])
+            b = sqrt(sum(ex[i:l].^2))
+            if abs(c)/b >= minSN || l == length(x)
+                push!(sbin,l)
+                i = l+1
+                break
+            end
+        end
+    end
+    return sbin
+end
+
+
+
+
+
 """
     GenRebin(x,rebs)::AbstractVector{Real}
 
@@ -72,7 +119,7 @@ Rebin input data following a given rebin schema.
 x = [1.,2.,3.,4.,]
 rbs = [1,3,4]
 
-GenRebin(x,rbs)
+JSPEC.GenRebin(x,rbs)
 
 # output
 
@@ -137,7 +184,8 @@ function IgnoreChannels(ds::Dict,chns; verbose=true)
     elseif uppercase(ds["Instrument"]) == uppercase("Other")
         if verbose
             println("Warning! Data are not from a multi-channel instrument.")
-        end        
+        end
+        ds["IgnoredChannels"] = false
     else
         mask = ones(Bool, length(ds["InputData"]))
         for e in chns
@@ -206,7 +254,7 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             elseif uppercase(ds["Instrument"]) == uppercase("Swift-BAT")
                 ds["RMF"] = DataFrame(rmf[2])
                 ds["Channels"] = DataFrame(rmf[3])
-                ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]            
+                ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
             elseif uppercase(ds["Instrument"]) == uppercase("SVOM-MXT")
                 ds["RMF"] = DataFrame(rmf[2])
                 ds["Channels"] = DataFrame(rmf[3])
@@ -236,7 +284,7 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
                 ds["SrcRate"] = DataFrame(pisrc[2])
                 ds["InputSrcRate"] = ds["SrcRate"][!,"RATE"]
                 ds["InputSrcRateErr"] = ds["SrcRate"][!,"STAT_ERR"]
-                ds["InputSrcRateSysErr"] = ds["SrcRate"][!,"SYS_ERR"]            
+                ds["InputSrcRateSysErr"] = ds["SrcRate"][!,"SYS_ERR"]
             elseif uppercase(ds["Instrument"]) == uppercase("SVOM-MXT")
                 ds["SrcCnt"] = DataFrame(pisrc[2])
                 ds["InputSrcData"] = ds["SrcCnt"][!,"COUNTS"]
@@ -262,7 +310,7 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             ds["BckExpTime"] = 1.
             ds["BckBackScal"] = 1.
         end
-        ds["BackScaleRatio"] = ds["SrcBackScal"]/ds["BckBackScal"] 
+        ds["BackScaleRatio"] = ds["SrcBackScal"]/ds["BckBackScal"]
         ds["ExposureRatio"] = ds["SrcExpTime"]/ds["BckExpTime"]
         #
         if uppercase(ds["Instrument"]) == uppercase("Swift-XRT")
@@ -302,7 +350,7 @@ function ImportOtherData(ds::Dict, energy, phflux, ephflux; bandwidth=1., verbos
     elseif uppercase(ds["Instrument"]) == uppercase("Other")
         ds["Energy"] = energy
         ds["PhFlux"] = phflux
-        ds["PhFluxErr"] = ephflux        
+        ds["PhFluxErr"] = ephflux
         ds["BandWidth"] = bandwidth
         ds["RMF"] = I
         ds["ImportedData"] = true
@@ -329,7 +377,7 @@ figraw = PlotRaw(newdataset)
 ```
 """
 function PlotRaw(ds::Dict; xlbl="Channels", ylbl=L"Counts ch$^{-1}$", tlbl=ds["Name"], verbose=true)::Figure
-    fig = Figure(fontsize=30)    
+    fig = Figure(fontsize=30)
     #
     ax = Axis(fig[1, 1],
         spinewidth=3,
@@ -345,13 +393,58 @@ function PlotRaw(ds::Dict; xlbl="Channels", ylbl=L"Counts ch$^{-1}$", tlbl=ds["N
         end
     elseif uppercase(ds["Instrument"]) == uppercase("Other")
         scatter!(ds["Energy"],ds["PhFlux"],color=(:orange,0.2))
-        errorbars!(ds["Energy"],ds["PhFlux"],ds["PhFluxErr"],color=(:orange,0.2))        
+        errorbars!(ds["Energy"],ds["PhFlux"],ds["PhFluxErr"],color=(:orange,0.2))
     else
         scatter!(ds["ChanNumber"],ds["InputData"],color=(:orange,0.2))
         errorbars!(ds["ChanNumber"],ds["InputData"],ds["InputDataErr"],color=(:orange,0.2))
     end
     #
     return fig
+end
+
+
+
+
+"""
+    RebinData(ds::Dict;minSN=5,verbose=true)
+
+Rebin input data with a given mininum S/N per bin. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
+
+# Examples
+```julia
+
+RebinData(newdataset)
+
+```
+"""
+function RebinData(ds::Dict;minSN=5,verbose=true)
+    if !ds["IgnoredChannels"]
+        if verbose
+            println("Warning! Channels not ignored yet.")
+        end
+        ds["RebinnedData"] = false
+    else
+        ds["RebinSchema"] = JSPEC.FindRebinSchema(ds["MaskedInputData"],ds["MaskedInputDataErr"],minSN=minSN)
+        ncts = zeros(Real,length(ds["RebinSchema"]))
+        encts = zeros(Real,length(ds["RebinSchema"]))
+        old = 1
+        for l in enumerate(ds["RebinSchema"])
+            c = sum(ds["MaskedInputData"][old:l[2]])
+            b = sqrt(sum(ds["MaskedInputDataErr"][old:l[2]].^2))
+            ncts[l[1]] = c/length(ds["MaskedInputData"][old:l[2]])
+            encts[l[1]] = b/length(ds["MaskedInputDataErr"][old:l[2]])
+            old = l[2]+1
+        end
+        if uppercase(ds["Instrument"]) == uppercase("Swift-XRT")
+            ds["RebinnedMaskedInputData"] = ncts/ds["SrcExpTime"]
+            ds["RebinnedMaskedInputDataErr"] = encts/ds["SrcExpTime"]
+        elseif uppercase(ds["Instrument"]) == uppercase("Swift-BAT")
+            ds["RebinnedMaskedInputData"] = ncts
+            ds["RebinnedMaskedInputDataErr"] = encts
+        end
+        #
+        ds["RebinnedData"] = true
+    end
 end
 
 

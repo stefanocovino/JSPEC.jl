@@ -81,6 +81,12 @@ IgnoreChannels(XRTdt,[0:30,1000:2047])
 ```
 
 
+And, data must often be rebinned to make the analysis based on a Gaussian likelihood meaningful. This can be achieved easily choosing the minium S/N per bin with, e.g.:
 
+```julia
+RebinData(XRTdt,minSN=7)
+```
+
+In case no rebinning is needed the step should be executed anyway with 'minSN=0'.
 
 
