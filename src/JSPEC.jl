@@ -14,6 +14,7 @@ export IgnoreChannels
 export ImportData
 export ImportOtherData
 export PlotRaw
+export PlotRebinned
 export RebinData
 
 
@@ -401,6 +402,47 @@ function PlotRaw(ds::Dict; xlbl="Channels", ylbl=L"Counts ch$^{-1}$", tlbl=ds["N
     #
     return fig
 end
+
+
+
+
+"""
+    PlotRebinned(ds:Dict; xlbl="Channels", ylbl="Counts", tlbl=ds.Name, verbose=true)::Figure
+
+Draw a plot of the raw input data. 'ds' is the JSPEC data set dictionary, 'xlbl' and 'ylbl' are the labels for the x and y axes, whule 'tlbl' is the plot title. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
+
+
+# Examples
+```julia
+figreb = PlotRebinned(newdataset)
+```
+"""
+function PlotRebinned(ds::Dict; xlbl="Channels", ylbl=L"Counts ch$^{-1}$ s$^{-1}$", tlbl=ds["Name"],verbose=true)::Figure
+    fig = Figure(fontsize=30)
+    #
+    ax = Axis(fig[1, 1],
+        spinewidth=3,
+        xlabel = xlbl,
+        ylabel = ylbl,
+        title = tlbl,
+        #yscale=log10,
+        #xscale=log10,
+        )
+    if uppercase(ds["Instrument"]) == uppercase("Other")
+        scatter!(ds["Energy"],ds["PhFlux"],color=(:orange,0.2))
+        errorbars!(ds["Energy"],ds["PhFlux"],ds["PhFluxErr"],color=(:orange,0.2))
+    elseif "RebinnedData" in keys(ds) && ds["RebinnedData"] && "RebinnedAncillaryData" in keys(ds) && ds["RebinnedAncillaryData"]
+      scatter!(ds["RebinnedMaskedChannel"],ds["RebinnedMaskedInputData"],color=(:orange,0.2))
+      errorbars!(ds["RebinnedMaskedChannel"],ds["RebinnedMaskedInputData"],ds["RebinnedMaskedInputDataErr"],color=(:orange,0.2))
+    else
+      if verbose
+        println("Warning! Data not fully rebinned yet.")
+      end
+    end
+    #
+    return fig
+end
+
 
 
 
