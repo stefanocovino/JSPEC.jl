@@ -38,6 +38,10 @@ using Test
     RebinData(newdt)
     @test newdt["RebinnedData"] == true
     #
+    # RebinAncillaryData
+    RebinAncillaryData(newdt)
+    @test newdt["RebinnedAncillaryData"] == true
+    #
     # PlotRebinned
     @test typeof(PlotRebinned(newdt)) == Figure
     #
