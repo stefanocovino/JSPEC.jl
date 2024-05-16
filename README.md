@@ -89,6 +89,12 @@ RebinData(XRTdt,minSN=7)
 
 In case no rebinning is needed the step should be executed anyway with 'minSN=0'.
 
+Once a rebinning schema has been defined, there are more input data to be properly rebinned:
+
+```julia
+RebinAncillaryData(XRTdt)
+```
+
 Now, it is also possible to visualize the rebinned data with:
 
 ```julia
