@@ -15,6 +15,7 @@ export ImportData
 export ImportOtherData
 export PlotRaw
 export PlotRebinned
+export RebinAncillaryData
 export RebinData
 
 
@@ -444,6 +445,32 @@ function PlotRebinned(ds::Dict; xlbl="Channels", ylbl=L"Counts ch$^{-1}$ s$^{-1}
 end
 
 
+
+"""
+    RebinAncillaryData(ds::Dict; verbose=true)
+
+Rebin ancillary data (channels, channel energy, etc.) with the rebin schema identified for input data.
+
+
+# Examples
+```julia
+
+RebinData(newdataset)
+
+```
+"""
+function RebinAncillaryData(ds::Dict; verbose=true)
+    if "RebinnedData" in keys(ds) && !ds["RebinnedData"]
+        if verbose
+            println("Warning! Channels not rebinned yet.")
+        end
+        ds["RebinnedAncillaryData"] = false
+    else
+        ds["RebinnedMaskedEnergy"] = JSPEC.GenRebin(ds["MaskedChannels"][!,"E"],ds["RebinSchema"])
+        ds["RebinnedMaskedChannel"] = JSPEC.GenRebin(ds["MaskedChannels"][!,"CHANNEL"],ds["RebinSchema"]) 
+        ds["RebinnedAncillaryData"] = true
+    end
+end
 
 
 
