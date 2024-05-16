@@ -28,11 +28,18 @@ KnownInstruments = ["Swift-XRT", "Swift-BAT", "SVOM-MXT", "Other"]
 """
     CreateDataSet(Name::String, Instrument::String; verbose=true)::Dict
 
-Create JSPECDataSent entry. 'Name' is the arbitrary name of the dataset one may choose and 'Instrument' is one of supperted instrument by the package. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
+Create a JSPECDataSent entry. 
+
+#Arguments
+
+- `Name` is the arbitrary name of the dataset.
+- `Instrument` is one of supperted instrument by the package. 
+- `verbose` enables warning messages.
 
 
 # Examples
 ```jldoctest
+
 newdataset = CreateDataSet("XRTTest","Swift-XRT")
 
 # output
