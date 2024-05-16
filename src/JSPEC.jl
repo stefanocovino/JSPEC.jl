@@ -455,7 +455,7 @@ Rebin ancillary data (channels, channel energy, etc.) with the rebin schema iden
 # Examples
 ```julia
 
-RebinData(newdataset)
+RebinAncilaryData(newdataset)
 
 ```
 """
