@@ -108,6 +108,17 @@ GenResponseMatrix(XRTdt)
 ```
 
 At this point, we need to define a model for our data. This can be expressed by regular `Julia` syntax.
-For instance, eith XRT and optical data, it might be something as:
+For instance, with XRT and optical data, it might be something as a simple power-law with local optical and X-ray extinction and absorption:
+
+```julia
+OptExt(E,EBV) = Extinction(12.4 ./ E,EBV,gal="SMC",Rv=FFGals["SMC"],z=0.)
+
+function MyModel(E,N,β,NH,EBV)
+        return PL(E,N,β) .* ifelse.(E .< 0.01, OptExt(E,EBV), XAbs(E,NH=NH,z=0.))
+    end
+```
+
+where we have used functions defined in the [`FittingFucntion.jl`](https://github.com/stefanocovino/FittingFunction.jl.git) package. It is important that the fucntion can be used for all the daasets considered in a given problem. 
+
 
 
