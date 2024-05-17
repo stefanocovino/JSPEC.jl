@@ -512,6 +512,11 @@ end
 
 Rebin ancillary data (channels, channel energy, etc.) with the rebin schema identified for input data.
 
+# Arguments
+
+- `ds` JSPEC data set disctionary.
+- `verbose` enables warning messages.
+
 
 # Examples
 ```julia
@@ -538,7 +543,14 @@ end
 """
     RebinData(ds::Dict;minSN=5,verbose=true)
 
-Rebin input data with a given mininum S/N per bin. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
+Rebin input data with a mininum S/N per bin. 
+
+# Arguments
+
+- `ds` JSPEC data set disctionary.
+- `minSN` minimum S/N per bin.
+- `verbose` enables warning messages.
+
 
 # Examples
 ```julia
