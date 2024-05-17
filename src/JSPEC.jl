@@ -187,11 +187,19 @@ end
 """
     IgnoreChannels(ds:Dict, chns; verbose=true)
 
-Ignore channels in the input data. 'ds' is the JSPEC data set dictionary, 'chns' is a vector of channels to be ignored, e.g. [0,1,2,3] or even [0:4, 1000:1023]. Please remeber that channel numebering starts with 0. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
+Ignore channels in the input data. 
+
+# Arguments
+
+- `ds` JSPEC data set dictionary.
+- `chns` vector of channels to be ignored, 
+    e.g. [0,1,2,3] or even [0:4, 1000:1023]. Pay attention that channel numbering starts at 0. 
+- `verbose` enables warning messages.
 
 
 # Examples
 ```julia
+
 IgnoreChannels(newdataset,[0,1,2,3])
 ```
 """
