@@ -370,7 +370,19 @@ end
 """
     ImportOtherData(ds::Dict, energy, phflux, ephflux; bandwidth=1., verbose=true)
 
-Import data already in physical units, 'ds' is a JEPC dictionary, 'energy' is KeV, 'phflux' is the corresponding photon flux density in photons cm^-2 s^-1 KeV^-1 and 'ephflux' the uncertainty. In case it is a photon flux (photons cm^-2 s^-1) the with, in KeV, of the band, 'bandwidth' must be provided. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
+Import data already in physical units. 
+
+# Arguments
+
+- `ds` JSPC dictionary.
+- `energy` input energy (KeV).
+- `phflux` photon flux density (``photons~cm{^-2}~s{^-1}~KeV{^-1})``. 
+- `ephflux` photon flux density uncertainty. 
+- `bandwidth` band width (KeV). 
+- `verbose? enable warning message.
+
+Bandwidth is needed only in case photon flux (``photons~cm{^-2}~s{^-1})``, rather then photon flux
+density, is provided.
 
 
 # Examples
