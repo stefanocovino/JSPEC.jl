@@ -416,8 +416,15 @@ end
 """
     PlotRaw(ds:Dict; xlbl="Channels", ylbl="Counts", tlbl=ds.Name, verbose=true)::Figure
 
-Draw a plot of the raw input data. 'ds' is the JSPEC data set dictionary, 'xlbl' and 'ylbl' are the labels for the x and y axes, whule 'tlbl' is the plot title. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
+Draw a plot of the raw input data. 
 
+# Arguments
+
+- `ds` JSPEC data set dictionary.
+- `xlbl` x-axis label.
+- `ylbl` y-axis label.
+- `tlbl` plot title.
+- `verbose` enables warning messages.
 
 # Examples
 ```julia
@@ -456,7 +463,15 @@ end
 """
     PlotRebinned(ds:Dict; xlbl="Channels", ylbl="Counts", tlbl=ds.Name, verbose=true)::Figure
 
-Draw a plot of the raw input data. 'ds' is the JSPEC data set dictionary, 'xlbl' and 'ylbl' are the labels for the x and y axes, whule 'tlbl' is the plot title. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
+Draw a plot of the rebinned input data. 
+
+# Arguments
+
+- `ds` JSPEC data set dictionary.
+- `xlbl` x-axis label.
+- `ylbl` y-axis label.
+- `tlbl` plot title.
+- `verbose` enables warning messages.
 
 
 # Examples
