@@ -76,7 +76,12 @@ end
 """
     FindRebinSchema(x,ey;minSN=5)::AbstractVector{Real}
 
-Compute the rebin schema to guarantee that the S/N is at least 'minSN' in each bin (or channel). 'x' and 'ex' are the input data and relative uncertainties.
+Compute the rebin schema to guarantee that the S/N is at least `minSN` in each bin (or channel). 
+
+# Arguments
+
+- `x` input array.
+- `ex` uncertainties.
 
 # Examples
 ```jldoctest
@@ -120,6 +125,11 @@ end
     GenRebin(x,rebs)::AbstractVector{Real}
 
 Rebin input data following a given rebin schema.
+
+# Arguments
+
+- `x` input array.
+- `rebs` array with rebin schema.
 
 
 # Examples
