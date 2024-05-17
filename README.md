@@ -107,5 +107,7 @@ And, finally, a response matrix properly rebinned following the rebin schema ide
 GenResponseMatrix(XRTdt)
 ```
 
-At this point, w eneed to define a model for our data. This can be expressed by regular `Julia` syntax as, for instance:
+At this point, we need to define a model for our data. This can be expressed by regular `Julia` syntax.
+For instance, eith XRT and optical data, it might be something as:
+
 
