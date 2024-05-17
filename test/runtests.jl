@@ -45,4 +45,8 @@ using Test
     # PlotRebinned
     @test typeof(PlotRebinned(newdt)) == Figure
     #
+    # GenResponseMatrix
+    GenResponseMatrix(newdt)
+    @test newdt["RebinnedResponseMatrix"] == true
+    #
 end

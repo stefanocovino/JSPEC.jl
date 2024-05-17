@@ -10,6 +10,7 @@ using LinearAlgebra
 
 export CreateDataSet
 export GetKnownInstruments
+export GenResponseMatrix
 export IgnoreChannels
 export ImportData
 export ImportOtherData
@@ -120,6 +121,25 @@ end
 
 
 
+"""
+    GetKnownInstruments()
+
+Returns the instruments currently supported by the JSPEC package.
+
+
+# Examples
+```julia
+@show GetKnownInstruments()
+```
+"""
+function GetKnownInstruments()
+    return KnownInstruments
+end
+
+
+
+
+
 
 """
     GenRebin(x,rebs)::AbstractVector{Real}
@@ -161,23 +181,44 @@ end
 
 
 
-
-
-
 """
-    GetKnownInstruments()
+    GenResponseMatrix(ds::Dict; verbose=true)
 
-Returns the instruments currently supported by the JSPEC package.
+Generate a rebinned response matrix following the rebin schema identified for input data.
+
+# Arguments
+
+- `ds` JSPEC data set dictionary.
 
 
 # Examples
 ```julia
-@show GetKnownInstruments()
+
+GenResponseMatrix(newdataset)
+
 ```
 """
-function GetKnownInstruments()
-    return KnownInstruments
+function GenResponseMatrix(ds::Dict; verbose=true)
+    if "RebinnedData" in keys(ds) && ds["RebinnedData"] && "RebinnedAncillaryData" in keys(ds) && ds["RebinnedAncillaryData"]
+        if uppercase(ds["Instrument"]) == uppercase("Swift-XRT")
+            matx = ds["MaskedRMF"][!,"MATRIX"] .* ds["ARF"][!,"SPECRESP"]
+        elseif uppercase(ds["Instrument"]) == uppercase("Swift-BAT")
+            matx = ds["MaskedRMF"][!,"MATRIX"]
+        end
+        #
+        vt = zeros(length(ds["RebinSchema"]),length(matx))
+        for i in 1:size(vt)[2]
+            vt[:,i] = JSPEC.GenRebin(matx[i],ds["RebinSchema"])
+        end
+        ds["RebinnedMaskedRMF"] = vt
+        ds["RebinnedResponseMatrix"] = true
+    else
+        if verbose
+            println("Warning! Data not fully rebinned yet!")
+        end
+    end
 end
+
 
 
 

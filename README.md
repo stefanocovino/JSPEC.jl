@@ -101,4 +101,11 @@ Now, it is also possible to visualize the rebinned data with:
 PlotRebinned(XRTdt)
 ```
 
+And, finally, a response matrix properly rebinned following the rebin schema identified above can be generated:
+
+```julia
+GenResponseMatrix(XRTdt)
+```
+
+At this point, w eneed to define a model for our data. This can be expressed by regular `Julia` syntax as, for instance:
 
