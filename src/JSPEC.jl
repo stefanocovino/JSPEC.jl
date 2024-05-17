@@ -244,7 +244,16 @@ end
 """
     ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::String="", bckfile::String="", verbose=true)
 
-Import data from "multi-channel" instruments (e.g., Swift-XRT) as FITS files and add fields to the JSPECDataSet dictionary. 'ds' is the JSPEC data set dictionary, 'rmfile' is the RMF response matrix, 'arffile' the effective area matrix, 'srcfile' the counts (or rates) for the source, and 'bckfile' the counts or rates for the background. If 'verbose' is set, it generates, if needed, a warning message if data are now properly processed.
+Import data from "multi-channel" instruments (e.g., Swift-XRT). 
+
+# Arguments
+
+- `ds`` JSPEC data set dictionary.
+- `rmfile`` RMF response matrix.
+- `arffile` effective area matrix.
+- `srcfile` source counts (or rate).
+- `bckfile` background counts (or rate). 
+- `verbose` enables warning messages.
 
 
 # Examples
