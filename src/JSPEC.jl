@@ -9,8 +9,9 @@ using LinearAlgebra
 
 
 export CreateDataSet
-export GetKnownInstruments
+export GenFullObsData
 export GenResponseMatrix
+export GetKnownInstruments
 export IgnoreChannels
 export ImportData
 export ImportOtherData
@@ -122,19 +123,54 @@ end
 
 
 """
-    GetKnownInstruments()
+    GenFullObsData(datasets;verbose=true)
 
-Returns the instruments currently supported by the JSPEC package.
+Gneerate input data basing on the available datasets. 
+
+# Arguments
+
+- `dataseys` array of JSPC dictionaries.
+- `verbose` enable warning message.
+
+It reports three arrays: inputdata, error on inputdata, input energies.
 
 
 # Examples
 ```julia
-@show GetKnownInstruments()
+GenFullObsData([dataset1, dataset2])
 ```
 """
-function GetKnownInstruments()
-    return KnownInstruments
+function GenFullObsData(datasets;verbose=true)
+    inp = Vector{Float64}()
+    einp = Vector{Float64}()
+    eninp = Vector{Float64}()
+    for d in datasets
+        if d["Instrument"] == "Other"
+            if "ImportedData" in keys(d) && d["ImportedData"]
+                append!(inp,d["PhFlux"])
+                append!(einp,d["PhFluxErr"])
+                append!(eninp,d["Energy"])
+            else
+                if verbose
+                    println("Warning! Dataset ",d["Name"]," not properly processed yet.")
+                end
+            end
+        else
+            if "RebinnedData" in keys(d) && d["RebinnedData"] && "RebinnedAncillaryData" in keys(d) && d["RebinnedAncillaryData"]
+                append!(inp,d["RebinnedMaskedInputData"])
+                append!(einp,d["RebinnedMaskedInputDataErr"])
+                append!(eninp,d["RebinnedMaskedEnergy"])
+            else
+                if verbose
+                    println("Warning! Dataset ",d["Name"]," not properly processed yet.")
+                end
+            end
+        end
+    end
+    return inp,einp,eninp
 end
+
+
 
 
 
@@ -220,6 +256,21 @@ function GenResponseMatrix(ds::Dict; verbose=true)
 end
 
 
+
+"""
+    GetKnownInstruments()
+
+Returns the instruments currently supported by the JSPEC package.
+
+
+# Examples
+```julia
+@show GetKnownInstruments()
+```
+"""
+function GetKnownInstruments()
+    return KnownInstruments
+end
 
 
 
@@ -420,7 +471,7 @@ Import data already in physical units.
 - `phflux` photon flux density (``photons~cm{^-2}~s{^-1}~KeV{^-1})``. 
 - `ephflux` photon flux density uncertainty. 
 - `bandwidth` band width (KeV). 
-- `verbose? enable warning message.
+- `verbose` enable warning message.
 
 Bandwidth is needed only in case photon flux (``photons~cm{^-2}~s{^-1})``, rather then photon flux
 density, is provided.
@@ -443,6 +494,9 @@ function ImportOtherData(ds::Dict, energy, phflux, ephflux; bandwidth=1., verbos
         ds["BandWidth"] = bandwidth
         ds["RMF"] = I
         ds["ImportedData"] = true
+        # Steps added to performace reasons
+        ds["RebinnedMaskedRMF"] = I
+        ds["RebinnedResponseMatrix"] = true
     else
         if verbose
             println("This function can be used only for data declared as 'Other'.")

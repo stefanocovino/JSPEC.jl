@@ -107,18 +107,29 @@ And, finally, a response matrix properly rebinned following the rebin schema ide
 GenResponseMatrix(XRTdt)
 ```
 
-At this point, we need to define a model for our data. This can be expressed by regular `Julia` syntax.
+At this point, we need to define a model for our data. This can be expressed by regular `Julia` syntax, although the function 
+arguments should be set up to allow JSPEC to convolve the function results with the response matrices and be able to compare the
+ odel prediction with the observation.
+ 
 For instance, with XRT and optical data, it might be something as a simple power-law with local optical and X-ray extinction and absorption:
 
 ```julia
 OptExt(E,EBV) = Extinction(12.4 ./ E,EBV,gal="SMC",Rv=FFGals["SMC"],z=0.)
 
-function MyModel(E,N,β,NH,EBV)
-        return PL(E,N,β) .* ifelse.(E .< 0.01, OptExt(E,EBV), XAbs(E,NH=NH,z=0.))
-    end
+function MyModel(pars,E)
+    N,β,NH,EBV = pars
+    return PL(E,N,β) .* ifelse.(E .< 0.01, OptExt(E,EBV), XAbs(E,NH=NH,z=0.))
+end
 ```
 
-where we have used functions defined in the [`FittingFucntion.jl`](https://github.com/stefanocovino/FittingFunction.jl.git) package. It is important that the fucntion can be used for all the daasets considered in a given problem. 
+where we have used functions defined in the [`FittingFucntion.jl`](https://github.com/stefanocovino/FittingFunction.jl.git) package. It is important to check that the defined function can be used for all the energy ranges covered by the imported datasets.
+
+Vectors with the observatins, uncertainties and input energies for all the imported datased can be obtained with:
 
 
+```julia
+obs,eobs,engy = GenFullObsData([Optdt,XRTdt])
+```
+
+Finally...
 

@@ -49,4 +49,7 @@ using Test
     GenResponseMatrix(newdt)
     @test newdt["RebinnedResponseMatrix"] == true
     #
+    # GenFullObsData
+    @test typeof(GenFullObsData([newodt,newdt])) == Tuple{Vector{Float64}, Vector{Float64}, Vector{Float64}}
+    #
 end
