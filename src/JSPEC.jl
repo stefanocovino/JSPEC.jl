@@ -15,6 +15,7 @@ export GetKnownInstruments
 export IgnoreChannels
 export ImportData
 export ImportOtherData
+export JSPECFunc
 export PlotRaw
 export PlotRebinned
 export RebinAncillaryData
@@ -149,7 +150,7 @@ function GenFullObsData(datasets;verbose=true)
             if "ImportedData" in keys(d) && d["ImportedData"]
                 append!(inp,d["PhFlux"])
                 append!(einp,d["PhFluxErr"])
-                append!(eninp,d["Energy"])
+                append!(eninp,d["Energy"][!,"E"])
             else
                 if verbose
                     println("Warning! Dataset ",d["Name"]," not properly processed yet.")
@@ -488,10 +489,11 @@ function ImportOtherData(ds::Dict, energy, phflux, ephflux; bandwidth=1., verbos
             println("Warning! Dataset not created yet.")
         end
     elseif uppercase(ds["Instrument"]) == uppercase("Other")
-        ds["Energy"] = energy
+        ds["Energy"] = DataFrame(E=energy,ΔE=bandwidth)
+        #ds["Energy"] = energy
         ds["PhFlux"] = phflux
         ds["PhFluxErr"] = ephflux
-        ds["BandWidth"] = bandwidth
+        #ds["BandWidth"] = bandwidth
         ds["RMF"] = I
         ds["ImportedData"] = true
         # Steps added to performace reasons
@@ -504,6 +506,40 @@ function ImportOtherData(ds::Dict, energy, phflux, ephflux; bandwidth=1., verbos
         ds["ImportedData"] = false
     end
 end
+
+
+
+"""
+    JSPECFunc(pars,dts,inpfnc)
+
+Convolve the output of the `inpfnc` function with the responce matrices of the imported data.
+
+
+# Arguments
+
+- `pars` paramters for the `inpfnc` function.
+- `dts` array of JSPEC dictionaries.
+- `inpfnc` function to model the imported data.
+
+`inpfnc` can be any legal `Julia` function. THe function should be declared as in the following example.
+
+
+# Examples
+```julia
+
+function Myfunc(pars,Energy)
+    N, λ = pars
+    return anyfunc(E,N,λ)
+end
+
+JSPECFunc([N,λ], [Optdt,XRTdt], Myfunc)
+```
+"""
+function JSPECFunc(pars,dts,inpfnc)
+    res = map(d -> d["RebinnedMaskedRMF"] * (inpfnc(pars,d["Energy"][!,"E"]) .* d["Energy"][!,"ΔE"]), dts)
+    return collect(Iterators.flatten(res))
+end
+
 
 
 
@@ -542,8 +578,8 @@ function PlotRaw(ds::Dict; xlbl="Channels", ylbl=L"Counts ch$^{-1}$", tlbl=ds["N
             println("Warning! Data not imported yet.")
         end
     elseif uppercase(ds["Instrument"]) == uppercase("Other")
-        scatter!(ds["Energy"],ds["PhFlux"],color=(:orange,0.2))
-        errorbars!(ds["Energy"],ds["PhFlux"],ds["PhFluxErr"],color=(:orange,0.2))
+        scatter!(ds["Energy"][!,"E"],ds["PhFlux"],color=(:orange,0.2))
+        errorbars!(ds["Energy"][!,"E"],ds["PhFlux"],ds["PhFluxErr"],color=(:orange,0.2))
     else
         scatter!(ds["ChanNumber"],ds["InputData"],color=(:orange,0.2))
         errorbars!(ds["ChanNumber"],ds["InputData"],ds["InputDataErr"],color=(:orange,0.2))

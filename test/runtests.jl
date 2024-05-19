@@ -52,4 +52,11 @@ using Test
     # GenFullObsData
     @test typeof(GenFullObsData([newodt,newdt])) == Tuple{Vector{Float64}, Vector{Float64}, Vector{Float64}}
     #
+    # JSPECFunc
+    function Myfunc(pars,E)
+        A,B = pars
+        return (A.+B).*E
+    end
+    @test JSPECFunc([1.,2.],[newodt,],Myfunc) == [3.0,6.0,9.0,12.0]
+    #    
 end
