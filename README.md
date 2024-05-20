@@ -131,5 +131,13 @@ Vectors with the observatins, uncertainties and input energies for all the impor
 obs,eobs,engy = GenFullObsData([Optdt,XRTdt])
 ```
 
-Finally...
+Finally, having defined a theoretical model, we can convolve it with the various, possiby rebinned, responce matrices of the imported datasets to obtain model predictions to be compared with the observed data. This can be obtained by means of the `JSPECFunc` function as:
+
+```julia
+modpreds = JSPECFunc(pars,[Optdt,XRTdt],MyModel)
+```
+
+`JSPECFunc` with the right parameters can be used for any optimization problem or for any Baysian analysis involving sampling, etc.
+
+
 
