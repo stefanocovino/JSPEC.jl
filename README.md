@@ -28,7 +28,7 @@ Documentation for the package and use examples can be found [here](https://stefa
 
 ### Similar tools
 
-If you are interested in similar capabilities you may also check the "[SpectralFitting.jl](https://github.com/fjebaker/SpectralFitting.jl?tab=readme-ov-file)" and "[LibXSPEC_jll.jl](https://github.com/astro-group-bristol/LibXSPEC_jll.jl)".
+If you are interested in similar (or better) capabilities you may also check the "[SpectralFitting.jl](https://github.com/fjebaker/SpectralFitting.jl?tab=readme-ov-file)" and "[LibXSPEC_jll.jl](https://github.com/astro-group-bristol/LibXSPEC_jll.jl)".
 
 
 ## Getting Started

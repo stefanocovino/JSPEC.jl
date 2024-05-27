@@ -8,6 +8,7 @@ using LinearAlgebra
 
 
 
+export Angstrom2KeV
 export CreateDataSet
 export GenFullObsData
 export GenResponseMatrix
@@ -16,10 +17,46 @@ export IgnoreChannels
 export ImportData
 export ImportOtherData
 export JSPECFunc
+export Jy2PhFlux
 export PlotRaw
 export PlotRebinned
 export RebinAncillaryData
 export RebinData
+
+
+
+
+
+"""
+    Angstrom2KeV(wave)
+
+Convert wavelengths in ``\angstrom`` to ``KeV``. 
+
+#Arguments
+
+- `wave` the input wavelengths.
+
+
+# Examples
+```jldoctest
+
+Angstrom2KeV(5000:5005)
+
+# output
+
+6-element Vector{Float64}:
+ 0.00248
+ 0.002479504099180164
+ 0.0024790083966413435
+ 0.0024785128922646415
+ 0.0024780175859312552
+ 0.0024775224775224775
+```
+"""
+function Angstrom2KeV(wave)
+    return 12.4 ./ wave
+end
+
 
 
 
@@ -203,7 +240,6 @@ JSPEC.GenRebin(x,rbs)
  1.0
  2.5
  4.0
-
 ```
 """
 function GenRebin(x,rebs)::AbstractVector{Real}
@@ -517,7 +553,7 @@ Convolve the output of the `inpfnc` function with the responce matrices of the i
 
 # Arguments
 
-- `pars` paramters for the `inpfnc` function.
+- `pars` parameters for the `inpfnc` function.
 - `dts` array of JSPEC dictionaries.
 - `inpfnc` function to model the imported data.
 
@@ -538,6 +574,40 @@ JSPECFunc([N,λ], [Optdt,XRTdt], Myfunc)
 function JSPECFunc(pars,dts,inpfnc)
     res = map(d -> d["RebinnedMaskedRMF"] * (inpfnc(pars,d["Energy"][!,"E"]) .* d["Energy"][!,"ΔE"]), dts)
     return collect(Iterators.flatten(res))
+end
+
+
+
+"""
+    Jy2PhFlux(energy,jyspectrum)
+
+Convert an input sectrum in ``Jy``to ``ph~s^{-1}~cm^{-2}~KeV^{-1}``. 
+
+# Arguments
+
+- `energy` input energy of the spectrum in ``KeV``.
+- `jyspectrum` input spectrum in ``Jy``.
+
+
+
+# Examples
+```jldoctest
+
+e = [1.,2.,3.,4.,]
+sp = [1e-3,3e-3,4e-3,5e-3]
+
+Jy2PhFlux(e,sp)
+
+# output
+
+4-element Vector{Float64}:
+ 1.51
+ 2.265
+ 2.013333333333333
+ 1.8875
+"""
+function Jy2PhFlux(energy,jyspectrum)
+    return jyspectrum .* 1.51e3 ./ energy
 end
 
 
