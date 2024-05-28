@@ -18,6 +18,7 @@ export ImportData
 export ImportOtherData
 export JSPECFunc
 export Jy2PhFlux
+export KeV2Angstrom
 export PlotRaw
 export PlotRebinned
 export RebinAncillaryData
@@ -30,7 +31,7 @@ export RebinData
 """
     Angstrom2KeV(wave)
 
-Convert wavelengths in ``\angstrom`` to ``KeV``. 
+Convert wavelengths in Angstrom (``10^{-8}~m``) to ``KeV``. 
 
 #Arguments
 
@@ -581,7 +582,7 @@ end
 """
     Jy2PhFlux(energy,jyspectrum)
 
-Convert an input sectrum in ``Jy``to ``ph~s^{-1}~cm^{-2}~KeV^{-1}``. 
+Convert an input sectrum in ``Jy`` to ``ph~s^{-1}~cm^{-2}~KeV^{-1}``. 
 
 # Arguments
 
@@ -609,6 +610,36 @@ Jy2PhFlux(e,sp)
 function Jy2PhFlux(energy,jyspectrum)
     return jyspectrum .* 1.51e3 ./ energy
 end
+
+
+
+
+"""
+    KeV2Angstrom(energy)
+
+Convert photon energy (``KeV``) to wavelengths in Angstrom (``10^{-8}~m``). 
+
+#Arguments
+
+- `energy` the input photon energy.
+
+
+# Examples
+```jldoctest
+
+KeV2Angstrom(1:3)
+
+# output
+
+0.08064516129032258:0.08064516129032258:0.24193548387096775
+```
+"""
+function KeV2Angstrom(energy)
+    return energy ./ 12.4
+end
+
+
+
 
 
 
