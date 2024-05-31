@@ -18,7 +18,7 @@ will install this package.
 
 ### Instruments
 
-JSPEC currently handles data from [Swift-BAT](https://science.nasa.gov/mission/swift/), [Swift-XRT](https://science.nasa.gov/mission/swift/) and [SVOM-MXT](https://www.svom.eu/en/the-svom-mission/).  
+JSPEC currently handles data from [Swift-BAT](https://science.nasa.gov/mission/swift/), [Swift-XRT](https://science.nasa.gov/mission/swift/), [SVOM-MXT](https://www.svom.eu/en/the-svom-mission/) and [NuSTAR-FPMA](https://heasarc.gsfc.nasa.gov/docs/nustar/).  
 
 
 ### Documentation and examples

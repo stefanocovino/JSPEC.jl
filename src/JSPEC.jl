@@ -61,7 +61,7 @@ end
 
 
 
-KnownInstruments = ["Swift-XRT", "Swift-BAT", "SVOM-MXT", "Other"]
+KnownInstruments = ["Swift-XRT", "Swift-BAT", "SVOM-MXT", "Other", "NuStar-FPMA"]
 
 
 
@@ -411,7 +411,7 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             println("Warning! Unknown intrument.")
         end
     else
-        if rmffile != ""
+        if rmffile != ""  
             rmf = FITS(rmffile)
             if uppercase(ds["Instrument"]) == uppercase("Swift-XRT")
                 ds["RMF"] = DataFrame(rmf[3])
@@ -424,6 +424,10 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             elseif uppercase(ds["Instrument"]) == uppercase("SVOM-MXT")
                 ds["RMF"] = DataFrame(rmf[2])
                 ds["Channels"] = DataFrame(rmf[3])
+                ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
+            elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPMA")
+                ds["RMF"] = DataFrame(rmf[3])
+                ds["Channels"] = DataFrame(rmf[2])
                 ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
             end
             #
@@ -438,6 +442,8 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             if uppercase(ds["Instrument"]) == uppercase("Swift-XRT")
                 ds["ARF"] = DataFrame(arf[2])
             elseif uppercase(ds["Instrument"]) == uppercase("SVOM-MXT")
+                ds["ARF"] = DataFrame(arf[2])
+            elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPMA")
                 ds["ARF"] = DataFrame(arf[2])
             end
         end
@@ -454,6 +460,9 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             elseif uppercase(ds["Instrument"]) == uppercase("SVOM-MXT")
                 ds["SrcCnt"] = DataFrame(pisrc[2])
                 ds["InputSrcData"] = ds["SrcCnt"][!,"COUNTS"]
+            elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPMA")
+                ds["SrcCnt"] = DataFrame(pisrc[2])
+                ds["InputSrcData"] = ds["SrcCnt"][!,"COUNTS"]            
             end
             heasrc = read_header(pisrc[2])
             ds["SrcExpTime"] = heasrc["EXPOSURE"]
@@ -467,6 +476,9 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             elseif uppercase(ds["Instrument"]) == uppercase("SVOM-MXT")
                 ds["BckCnt"] = DataFrame(pibck[2])
                 ds["InputBckData"] = ds["BckCnt"][!,"COUNTS"]
+            elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPMA")
+                ds["BckCnt"] = DataFrame(pibck[2])
+                ds["InputBckData"] = ds["BckCnt"][!,"COUNTS"]            
             end
             #
             heabck = read_header(pibck[2])
@@ -490,6 +502,10 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             ds["InputBckDataCorr"] = ds["InputBckData"]*ds["BackScaleRatio"]*ds["ExposureRatio"]
             ds["InputData"] = ds["InputSrcData"] .- ds["InputBckDataCorr"]
             ds["InputDataErr"] = sqrt.(ds["InputSrcData"] .+ ds["InputBckDataCorr"])
+        elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPMA")
+            ds["InputBckDataCorr"] = ds["InputBckData"]*ds["BackScaleRatio"]*ds["ExposureRatio"]
+            ds["InputData"] = ds["InputSrcData"] .- ds["InputBckDataCorr"]
+            ds["InputDataErr"] = sqrt.(ds["InputSrcData"] .+ ds["InputBckDataCorr"])        
         end
         ds["ImportedData"] = true
     end
