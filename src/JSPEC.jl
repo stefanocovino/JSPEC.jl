@@ -61,7 +61,7 @@ end
 
 
 
-KnownInstruments = ["Swift-XRT", "Swift-BAT", "SVOM-MXT", "Other", "NuStar-FPMA"]
+KnownInstruments = ["Swift-XRT", "Swift-BAT", "SVOM-MXT", "Other", "NuSTAR-FPMA"]
 
 
 
@@ -353,6 +353,12 @@ function IgnoreChannels(ds::Dict,chns; verbose=true)
         if uppercase(ds["Instrument"]) == uppercase("Swift-XRT")
             ds["MaskedInputSrcData"] = ds["InputSrcData"][mask]
             ds["MaskedInputBckData"] = ds["InputBckDataCorr"][mask]
+        elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPMA")
+            ds["MaskedInputSrcData"] = ds["InputSrcData"][mask]
+            ds["MaskedInputBckData"] = ds["InputBckDataCorr"][mask]
+        elseif uppercase(ds["Instrument"]) == uppercase("SVOM-MXT")
+            ds["MaskedInputSrcData"] = ds["InputSrcData"][mask]
+            ds["MaskedInputBckData"] = ds["InputBckDataCorr"][mask]
         end
         #ds["MaskedChanNumber"] = ds["ChanNumber"][mask]
         #
@@ -429,6 +435,7 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
                 ds["RMF"] = DataFrame(rmf[3])
                 ds["Channels"] = DataFrame(rmf[2])
                 ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
+                df["RMF"][!,"MATRIX"] = read(rmf[3],"MATRIX")
             end
             #
             ds["Channels"][!,"E"] = (ds["Channels"][!,"E_MIN"] + ds["Channels"][!,"E_MAX"])/2.
