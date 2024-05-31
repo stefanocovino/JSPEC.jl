@@ -435,7 +435,7 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
                 ds["RMF"] = DataFrame(rmf[3])
                 ds["Channels"] = DataFrame(rmf[2])
                 ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
-                df["RMF"][!,"MATRIX"] = read(rmf[3],"MATRIX")
+                ds["RMF"][!,"MATRIX"] = read(rmf[3],"MATRIX")
             end
             #
             ds["Channels"][!,"E"] = (ds["Channels"][!,"E_MIN"] + ds["Channels"][!,"E_MAX"])/2.
