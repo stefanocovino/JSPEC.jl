@@ -31,7 +31,7 @@ export RebinData
 """
     Angstrom2KeV(wave)
 
-Convert wavelengths in Angstrom (``10^{-8}~m``) to ``KeV``. 
+Convert wavelengths in Angstrom (``10^{-8}~m``) to ``KeV``.
 
 #Arguments
 
@@ -61,7 +61,7 @@ end
 
 
 
-KnownInstruments = ["Swift-XRT", "Swift-BAT", "SVOM-MXT", "Other", "NuSTAR-FPMA"]
+KnownInstruments = ["Swift-XRT", "Swift-BAT", "SVOM-MXT", "Other", "NuSTAR-FPM", "XMM-EMOS", "XMM-EPN"]
 
 
 
@@ -69,12 +69,12 @@ KnownInstruments = ["Swift-XRT", "Swift-BAT", "SVOM-MXT", "Other", "NuSTAR-FPMA"
 """
     CreateDataSet(Name::String, Instrument::String; verbose=true)::Dict
 
-Create a JSPECDataSent entry. 
+Create a JSPECDataSent entry.
 
 #Arguments
 
 - `Name` is the arbitrary name of the dataset.
-- `Instrument` is one of supperted instrument by the package. 
+- `Instrument` is one of supperted instrument by the package.
 - `verbose` enables warning messages.
 
 
@@ -117,7 +117,7 @@ end
 """
     FindRebinSchema(x,ey;minSN=5)::AbstractVector{Real}
 
-Compute the rebin schema to guarantee that the S/N is at least `minSN` in each bin (or channel). 
+Compute the rebin schema to guarantee that the S/N is at least `minSN` in each bin (or channel).
 
 # Arguments
 
@@ -164,7 +164,7 @@ end
 """
     GenFullObsData(datasets;verbose=true)
 
-Gneerate input data basing on the available datasets. 
+Gneerate input data basing on the available datasets.
 
 # Arguments
 
@@ -278,6 +278,12 @@ function GenResponseMatrix(ds::Dict; verbose=true)
             matx = ds["MaskedRMF"][!,"MATRIX"] .* ds["ARF"][!,"SPECRESP"]
         elseif uppercase(ds["Instrument"]) == uppercase("Swift-BAT")
             matx = ds["MaskedRMF"][!,"MATRIX"]
+        elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPM")
+            matx = ds["MaskedRMF"][!,"MATRIX"] .* ds["ARF"][!,"SPECRESP"]
+        elseif uppercase(ds["Instrument"]) == uppercase("XMM-EMOS")
+            matx = ds["MaskedRMF"][!,"MATRIX"] .* ds["ARF"][!,"SPECRESP"]
+        elseif uppercase(ds["Instrument"]) == uppercase("XMM-EPN")
+            matx = ds["MaskedRMF"][!,"MATRIX"] .* ds["ARF"][!,"SPECRESP"]
         end
         #
         vt = zeros(length(ds["RebinSchema"]),length(matx))
@@ -317,13 +323,13 @@ end
 """
     IgnoreChannels(ds:Dict, chns; verbose=true)
 
-Ignore channels in the input data. 
+Ignore channels in the input data.
 
 # Arguments
 
 - `ds` JSPEC data set dictionary.
-- `chns` vector of channels to be ignored, 
-    e.g. [0,1,2,3] or even [0:4, 1000:1023]. Pay attention that channel numbering starts at 0. 
+- `chns` vector of channels to be ignored,
+    e.g. [0,1,2,3] or even [0:4, 1000:1023]. Pay attention that channel numbering starts at 0.
 - `verbose` enables warning messages.
 
 
@@ -353,10 +359,16 @@ function IgnoreChannels(ds::Dict,chns; verbose=true)
         if uppercase(ds["Instrument"]) == uppercase("Swift-XRT")
             ds["MaskedInputSrcData"] = ds["InputSrcData"][mask]
             ds["MaskedInputBckData"] = ds["InputBckDataCorr"][mask]
-        elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPMA")
+        elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPM")
             ds["MaskedInputSrcData"] = ds["InputSrcData"][mask]
             ds["MaskedInputBckData"] = ds["InputBckDataCorr"][mask]
         elseif uppercase(ds["Instrument"]) == uppercase("SVOM-MXT")
+            ds["MaskedInputSrcData"] = ds["InputSrcData"][mask]
+            ds["MaskedInputBckData"] = ds["InputBckDataCorr"][mask]
+        elseif uppercase(ds["Instrument"]) == uppercase("XMM-EMOS")
+            ds["MaskedInputSrcData"] = ds["InputSrcData"][mask]
+            ds["MaskedInputBckData"] = ds["InputBckDataCorr"][mask]
+        elseif uppercase(ds["Instrument"]) == uppercase("XMM-EPN")
             ds["MaskedInputSrcData"] = ds["InputSrcData"][mask]
             ds["MaskedInputBckData"] = ds["InputBckDataCorr"][mask]
         end
@@ -380,7 +392,7 @@ end
 """
     ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::String="", bckfile::String="", verbose=true)
 
-Import data from "multi-channel" instruments (e.g., Swift-XRT). 
+Import data from "multi-channel" instruments (e.g., Swift-XRT).
 
 # Arguments
 
@@ -388,7 +400,7 @@ Import data from "multi-channel" instruments (e.g., Swift-XRT).
 - `rmfile`` RMF response matrix.
 - `arffile` effective area matrix.
 - `srcfile` source counts (or rate).
-- `bckfile` background counts (or rate). 
+- `bckfile` background counts (or rate).
 - `verbose` enables warning messages.
 
 
@@ -417,7 +429,7 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             println("Warning! Unknown intrument.")
         end
     else
-        if rmffile != ""  
+        if rmffile != ""
             rmf = FITS(rmffile)
             if uppercase(ds["Instrument"]) == uppercase("Swift-XRT")
                 ds["RMF"] = DataFrame(rmf[3])
@@ -431,11 +443,19 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
                 ds["RMF"] = DataFrame(rmf[2])
                 ds["Channels"] = DataFrame(rmf[3])
                 ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
-            elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPMA")
+            elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPM")
                 ds["RMF"] = DataFrame(rmf[3])
                 ds["Channels"] = DataFrame(rmf[2])
                 ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
-                ds["RMF"][!,"MATRIX"] = read(rmf[3],"MATRIX")
+                #ds["RMF"][!,"MATRIX"] = read(rmf[3],"MATRIX")
+            elseif uppercase(ds["Instrument"]) == uppercase("XMM-EMOS")
+                ds["RMF"] = DataFrame(rmf[2])
+                ds["Channels"] = DataFrame(rmf[3])
+                ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
+            elseif uppercase(ds["Instrument"]) == uppercase("XMM-EPN")
+                ds["RMF"] = DataFrame(rmf[2])
+                ds["Channels"] = DataFrame(rmf[3])
+                ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
             end
             #
             ds["Channels"][!,"E"] = (ds["Channels"][!,"E_MIN"] + ds["Channels"][!,"E_MAX"])/2.
@@ -450,7 +470,11 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
                 ds["ARF"] = DataFrame(arf[2])
             elseif uppercase(ds["Instrument"]) == uppercase("SVOM-MXT")
                 ds["ARF"] = DataFrame(arf[2])
-            elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPMA")
+            elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPM")
+                ds["ARF"] = DataFrame(arf[2])
+            elseif uppercase(ds["Instrument"]) == uppercase("XMM-EMOS")
+                ds["ARF"] = DataFrame(arf[2])
+            elseif uppercase(ds["Instrument"]) == uppercase("XMM-EPN")
                 ds["ARF"] = DataFrame(arf[2])
             end
         end
@@ -467,9 +491,15 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             elseif uppercase(ds["Instrument"]) == uppercase("SVOM-MXT")
                 ds["SrcCnt"] = DataFrame(pisrc[2])
                 ds["InputSrcData"] = ds["SrcCnt"][!,"COUNTS"]
-            elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPMA")
+            elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPM")
                 ds["SrcCnt"] = DataFrame(pisrc[2])
-                ds["InputSrcData"] = ds["SrcCnt"][!,"COUNTS"]            
+                ds["InputSrcData"] = ds["SrcCnt"][!,"COUNTS"]
+            elseif uppercase(ds["Instrument"]) == uppercase("XMM-EMOS")
+                ds["SrcCnt"] = DataFrame(pisrc[2])
+                ds["InputSrcData"] = ds["SrcCnt"][!,"COUNTS"]
+            elseif uppercase(ds["Instrument"]) == uppercase("XMM-EPN")
+                ds["SrcCnt"] = DataFrame(pisrc[2])
+                ds["InputSrcData"] = ds["SrcCnt"][!,"COUNTS"]
             end
             heasrc = read_header(pisrc[2])
             ds["SrcExpTime"] = heasrc["EXPOSURE"]
@@ -483,9 +513,15 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             elseif uppercase(ds["Instrument"]) == uppercase("SVOM-MXT")
                 ds["BckCnt"] = DataFrame(pibck[2])
                 ds["InputBckData"] = ds["BckCnt"][!,"COUNTS"]
-            elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPMA")
+            elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPM")
                 ds["BckCnt"] = DataFrame(pibck[2])
-                ds["InputBckData"] = ds["BckCnt"][!,"COUNTS"]            
+                ds["InputBckData"] = ds["BckCnt"][!,"COUNTS"]
+            elseif uppercase(ds["Instrument"]) == uppercase("XMM-EMOS")
+                ds["BckCnt"] = DataFrame(pibck[2])
+                ds["InputBckData"] = ds["BckCnt"][!,"COUNTS"]
+            elseif uppercase(ds["Instrument"]) == uppercase("XMM-EPN")
+                ds["BckCnt"] = DataFrame(pibck[2])
+                ds["InputBckData"] = ds["BckCnt"][!,"COUNTS"]
             end
             #
             heabck = read_header(pibck[2])
@@ -509,12 +545,28 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             ds["InputBckDataCorr"] = ds["InputBckData"]*ds["BackScaleRatio"]*ds["ExposureRatio"]
             ds["InputData"] = ds["InputSrcData"] .- ds["InputBckDataCorr"]
             ds["InputDataErr"] = sqrt.(ds["InputSrcData"] .+ ds["InputBckDataCorr"])
-        elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPMA")
+        elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPM")
             ds["InputBckDataCorr"] = ds["InputBckData"]*ds["BackScaleRatio"]*ds["ExposureRatio"]
             ds["InputData"] = ds["InputSrcData"] .- ds["InputBckDataCorr"]
-            ds["InputDataErr"] = sqrt.(ds["InputSrcData"] .+ ds["InputBckDataCorr"])        
+            ds["InputDataErr"] = sqrt.(ds["InputSrcData"] .+ ds["InputBckDataCorr"])
+        elseif uppercase(ds["Instrument"]) == uppercase("XMM-EMOS")
+            ds["InputBckDataCorr"] = ds["InputBckData"]*ds["BackScaleRatio"]*ds["ExposureRatio"]
+            ds["InputData"] = ds["InputSrcData"] .- ds["InputBckDataCorr"]
+            ds["InputDataErr"] = sqrt.(ds["InputSrcData"] .+ ds["InputBckDataCorr"])
+        elseif uppercase(ds["Instrument"]) == uppercase("XMM-EPN")
+            ds["InputBckDataCorr"] = ds["InputBckData"]*ds["BackScaleRatio"]*ds["ExposureRatio"]
+            ds["InputData"] = ds["InputSrcData"] .- ds["InputBckDataCorr"]
+            ds["InputDataErr"] = sqrt.(ds["InputSrcData"] .+ ds["InputBckDataCorr"])
         end
-        ds["ImportedData"] = true
+        #
+        if maximum(ds["RMF"][!,"N_GRP"]) > 1
+            ds["ImportedData"] = false
+            if verbose
+                println("Warning! Data appear to be grouped or rebinned already.")
+            end
+        else
+            ds["ImportedData"] = true
+        end
     end
 end
 
@@ -523,15 +575,15 @@ end
 """
     ImportOtherData(ds::Dict, energy, phflux, ephflux; bandwidth=1., verbose=true)
 
-Import data already in physical units. 
+Import data already in physical units.
 
 # Arguments
 
 - `ds` JSPC dictionary.
 - `energy` input energy (KeV).
-- `phflux` photon flux density (``photons~cm{^-2}~s{^-1}~KeV{^-1})``. 
-- `ephflux` photon flux density uncertainty. 
-- `bandwidth` band width (KeV). 
+- `phflux` photon flux density (``photons~cm{^-2}~s{^-1}~KeV{^-1})``.
+- `ephflux` photon flux density uncertainty.
+- `bandwidth` band width (KeV).
 - `verbose` enable warning message.
 
 Bandwidth is needed only in case photon flux (``photons~cm{^-2}~s{^-1})``, rather then photon flux
@@ -605,7 +657,7 @@ end
 """
     Jy2PhFlux(energy,jyspectrum)
 
-Convert an input sectrum in ``Jy`` to ``ph~s^{-1}~cm^{-2}~KeV^{-1}``. 
+Convert an input sectrum in ``Jy`` to ``ph~s^{-1}~cm^{-2}~KeV^{-1}``.
 
 # Arguments
 
@@ -640,7 +692,7 @@ end
 """
     KeV2Angstrom(energy)
 
-Convert photon energy (``KeV``) to wavelengths in Angstrom (``10^{-8}~m``). 
+Convert photon energy (``KeV``) to wavelengths in Angstrom (``10^{-8}~m``).
 
 #Arguments
 
@@ -671,7 +723,7 @@ end
 """
     PlotRaw(ds:Dict; xlbl="Channels", ylbl="Counts", tlbl=ds.Name, verbose=true)::Figure
 
-Draw a plot of the raw input data. 
+Draw a plot of the raw input data.
 
 # Arguments
 
@@ -718,7 +770,7 @@ end
 """
     PlotRebinned(ds:Dict; xlbl="Channels", ylbl="Counts", tlbl=ds.Name, verbose=true)::Figure
 
-Draw a plot of the rebinned input data. 
+Draw a plot of the rebinned input data.
 
 # Arguments
 
@@ -788,7 +840,7 @@ function RebinAncillaryData(ds::Dict; verbose=true)
         ds["RebinnedAncillaryData"] = false
     else
         ds["RebinnedMaskedEnergy"] = JSPEC.GenRebin(ds["MaskedChannels"][!,"E"],ds["RebinSchema"])
-        ds["RebinnedMaskedChannel"] = JSPEC.GenRebin(ds["MaskedChannels"][!,"CHANNEL"],ds["RebinSchema"]) 
+        ds["RebinnedMaskedChannel"] = JSPEC.GenRebin(ds["MaskedChannels"][!,"CHANNEL"],ds["RebinSchema"])
         ds["RebinnedAncillaryData"] = true
     end
 end
@@ -798,7 +850,7 @@ end
 """
     RebinData(ds::Dict;minSN=5,verbose=true)
 
-Rebin input data with a mininum S/N per bin. 
+Rebin input data with a mininum S/N per bin.
 
 # Arguments
 
@@ -838,6 +890,15 @@ function RebinData(ds::Dict;minSN=5,verbose=true)
         elseif uppercase(ds["Instrument"]) == uppercase("Swift-BAT")
             ds["RebinnedMaskedInputData"] = ncts
             ds["RebinnedMaskedInputDataErr"] = encts
+        elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPM")
+            ds["RebinnedMaskedInputData"] = ncts/ds["SrcExpTime"]
+            ds["RebinnedMaskedInputDataErr"] = encts/ds["SrcExpTime"]
+        elseif uppercase(ds["Instrument"]) == uppercase("XMM-EMOS")
+            ds["RebinnedMaskedInputData"] = ncts/ds["SrcExpTime"]
+            ds["RebinnedMaskedInputDataErr"] = encts/ds["SrcExpTime"]
+        elseif uppercase(ds["Instrument"]) == uppercase("XMM-EPN")
+            ds["RebinnedMaskedInputData"] = ncts/ds["SrcExpTime"]
+            ds["RebinnedMaskedInputDataErr"] = encts/ds["SrcExpTime"]
         end
         #
         ds["RebinnedData"] = true
