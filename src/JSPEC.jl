@@ -435,27 +435,32 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
                 ds["RMF"] = DataFrame(rmf[3])
                 ds["Channels"] = DataFrame(rmf[2])
                 ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
+                rmfid = 3
             elseif uppercase(ds["Instrument"]) == uppercase("Swift-BAT")
                 ds["RMF"] = DataFrame(rmf[2])
                 ds["Channels"] = DataFrame(rmf[3])
                 ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
+                rmfid = 2
             elseif uppercase(ds["Instrument"]) == uppercase("SVOM-MXT")
                 ds["RMF"] = DataFrame(rmf[2])
                 ds["Channels"] = DataFrame(rmf[3])
                 ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
+                rmfid = 2
             elseif uppercase(ds["Instrument"]) == uppercase("NuSTAR-FPM")
                 ds["RMF"] = DataFrame(rmf[3])
                 ds["Channels"] = DataFrame(rmf[2])
                 ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
-                #ds["RMF"][!,"MATRIX"] = read(rmf[3],"MATRIX")
+                rmfid = 3
             elseif uppercase(ds["Instrument"]) == uppercase("XMM-EMOS")
                 ds["RMF"] = DataFrame(rmf[2])
                 ds["Channels"] = DataFrame(rmf[3])
                 ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
+                rmfid = 2
             elseif uppercase(ds["Instrument"]) == uppercase("XMM-EPN")
                 ds["RMF"] = DataFrame(rmf[2])
                 ds["Channels"] = DataFrame(rmf[3])
                 ds["ChanNumber"] = ds["Channels"][!,"CHANNEL"]
+                rmfid = 2
             end
             #
             ds["Channels"][!,"E"] = (ds["Channels"][!,"E_MIN"] + ds["Channels"][!,"E_MAX"])/2.
@@ -463,6 +468,49 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             en = (ds["RMF"][!,"ENERG_LO"] .+ ds["RMF"][!,"ENERG_HI"]) ./ 2
             de = (ds["RMF"][!,"ENERG_HI"] .- ds["RMF"][!,"ENERG_LO"])
             ds["Energy"] = DataFrame(E=en,ΔE=de, MinE=ds["RMF"][!,"ENERG_LO"], MaxE=ds["RMF"][!,"ENERG_HI"])
+            #
+            if !("MATRIX" in names(ds["RMF"]))
+                if verbose
+                    println("Warning! Data appear to be grouped or rebinned already.")
+                end
+                mtr = read(rmf[rmfid],"MATRIX")
+                if !("N_CHAN" in names(ds["RMF"]))
+                    nch = read(rmf[rmfid],"N_CHAN")
+                else
+                    nch = ds["RMF"][!,:N_CHAN]
+                end
+                if !("F_CHAN" in names(ds["RMF"]))
+                    fch = read(rmf[rmfid],"F_CHAN")
+                else
+                    fch = ds["RMF"][!,:F_CHAN]
+                end
+                #
+                headr = read_header(rmf[rmfid])
+                #
+                cols = []
+                for i in 1:nrow(ds["RMF"])
+                    vtrx = zeros(headr["TLMAX4"]+1)
+                    idx = 1
+                    for g in 1:ds["RMF"][i,:N_GRP]
+                        chstart = fch[i][g]
+                        for l in idx:idx+nch[i][g]-1
+                            vtrx[chstart+l-idx+1] = mtr[i][l]
+                        end
+                        idx = idx+nch[i][g]
+                    end
+                    push!(cols,vtrx)
+                end
+                #
+                ds["RMF"][!,"MATRIX"] = cols
+                ds["RMF"][!,"F_CHAN"] .= 0
+                ds["RMF"][!,"N_CHAN"] .= 1
+                ds["RMF"][!,"N_GRB"] .= 1
+                ds["DataOriginallyGrouped"] = true
+                if verbose
+                    println("Warning! Data reprocessed.")
+                end
+            end
+        end
         end
         if arffile != ""
             arf = FITS(arffile)
@@ -559,15 +607,7 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
             ds["InputDataErr"] = sqrt.(ds["InputSrcData"] .+ ds["InputBckDataCorr"])
         end
         #
-        if maximum(ds["RMF"][!,"N_GRP"]) > 1
-            ds["ImportedData"] = false
-            if verbose
-                println("Warning! Data appear to be grouped or rebinned already.")
-            end
-        else
-            ds["ImportedData"] = true
-        end
-    end
+    ds["ImportedData"] = true
 end
 
 
