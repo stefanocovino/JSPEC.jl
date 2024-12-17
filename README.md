@@ -58,7 +58,7 @@ Assuming we have the following 'ex.rmf', 'ex.arf', 'exsrc.pi' and 'exbck.pi' XRT
 ImportData(XRTdt, rmffile="ex.rmf", arffile="ex.arf", srcfile="exsrc.pi", bckfile="exbck.pi")
 ```
 
-Optical data, but also data from any other source where a non-diagonal response matrix is not needed, should be converted to energy, in KeV, and photon flux density in photons ``cm^{-2}~s{^-1}~KeV{^-1}``. Alternatively, data can be represented by flux but in such a case the bandwidth, again in ``KeV``, must be provided too.
+Optical data, but also data from any other source where a non-diagonal response matrix is not needed, should be converted to energy, in keV, and photon flux density in photons ``cm^{-2}~s{^-1}~keV{^-1}``. Alternatively, data can be represented by flux but in such a case the bandwidth, again in ``keV``, must be provided too.
 
 ```julia
 ImportOtherData(Optdt, energy=[1.,2.,3.,4], phflux=[0.1,0.2,0.3,0.4], ephflux=[0.01,0.02,0.03,0.04])
@@ -71,7 +71,7 @@ PlotRaw(XRTdt)
 
 or:
 ```julia
-PlotRaw(Optdt,ylbl=L"Photons s$^{-1}$ cm$^{-2}$ KeV$^{-1}$")
+PlotRaw(Optdt,ylbl=L"Photons s$^{-1}$ cm$^{-2}$ keV$^{-1}$")
 ```
 
 Often, for multi-channel instruments, channels can (or need to be) ignored. This can be achieved with, e.g.:

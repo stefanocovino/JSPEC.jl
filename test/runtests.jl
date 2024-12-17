@@ -58,7 +58,7 @@ using Test
         return (A.+B).*E
     end
     @test JSPECFunc([1.,2.],[newodt,],Myfunc) == [3.0,6.0,9.0,12.0]
-    #   
+    #
     # Angstrom2KeV
     @test Angstrom2KeV(5000:5004) == [0.00248,0.002479504099180164,0.0024790083966413435,0.0024785128922646415,0.0024780175859312552]
     #
@@ -69,5 +69,8 @@ using Test
     #
     # KeV2Angstrom
     @test KeV2Angstrom(1:3) == 0.08064516129032258:0.08064516129032258:0.24193548387096775
+    #
+    # KeV2Channel
+    @test KeV2Channel(newdt,1.2) == 120
     #
 end

@@ -19,6 +19,7 @@ export ImportOtherData
 export JSPECFunc
 export Jy2PhFlux
 export KeV2Angstrom
+export KeV2Channel
 export PlotRaw
 export PlotRebinned
 export RebinAncillaryData
@@ -31,7 +32,7 @@ export RebinData
 """
     Angstrom2KeV(wave)
 
-Convert wavelengths in Angstrom (``10^{-8}~m``) to ``KeV``.
+Convert wavelengths in Angstrom (``10^{-8}~m``) to ``keV``.
 
 #Arguments
 
@@ -168,7 +169,7 @@ Gneerate input data basing on the available datasets.
 
 # Arguments
 
-- `dataseys` array of JSPC dictionaries.
+- `datasets` array of JSPEC dictionaries.
 - `verbose` enable warning message.
 
 It reports three arrays: inputdata, error on inputdata, input energies.
@@ -619,7 +620,7 @@ Import data already in physical units.
 
 # Arguments
 
-- `ds` JSPC dictionary.
+- `ds` JSPEC dictionary.
 - `energy` input energy (KeV).
 - `phflux` photon flux density (``photons~cm{^-2}~s{^-1}~KeV{^-1})``.
 - `ephflux` photon flux density uncertainty.
@@ -753,6 +754,43 @@ function KeV2Angstrom(energy)
     return energy ./ 12.4
 end
 
+
+
+
+"""
+    KeV2Channel(ds::Dict, energy)
+
+Convert photon energy (``KeV``) to original detector channel.
+
+#Arguments
+
+- `ds` JSPEC dictionary.
+- `energy` the input photon energy.
+
+It returns `-1` if the energy is not in the covered range.
+
+
+# Examples
+```julia
+
+KeV2Channel(ds,1.2)
+
+# output
+
+11
+```
+"""
+function KeV2Channel(ds::Dict,energy)
+    minE = minimum(ds["Channels"][!,:E_MIN])
+    maxE = maximum(ds["Channels"][!,:E_MAX])
+    #
+    if !(minE <= energy <= maxE)
+      return -1
+    else
+      fdt = filter(row -> row.E_MIN >= energy, ds["Channels"])
+      return fdt[!,:CHANNEL][1]
+    end
+end
 
 
 
