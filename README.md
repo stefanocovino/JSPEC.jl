@@ -23,7 +23,7 @@ JSPEC currently handles data from [Swift-BAT](https://science.nasa.gov/mission/s
 
 ### Documentation and examples
 
-Documentation for the package and use examples can be found [here](https://stefanocovino.github.io/JSPEC.jl/stable/).
+Documentation for the package can be found [here](https://stefanocovino.github.io/JSPEC.jl/stable/).
 
 
 ### Similar tools
@@ -33,9 +33,18 @@ If you are interested in similar (or better) capabilities you may also check the
 
 ## Getting Started
 
-The purpose of the package is to provide tools to mode data from multi-channel instruments togeter, if needed, with data from any other surce. The package compute the needed response matrces that can then used for creating models, carry out fits, etc.
+The purpose of the package is to provide tools to mode data from multi-channel instruments togeter, if needed, with data from any other surce. The package compute the needed response matrices that can then used for creating models, carry out fits, etc.
 
 No attept has been tried, on purpose, to mimic the simplified XSPEC syntax to create models, etc. Therefore models, etc. will be coded accordind to a plain Julia syntax.
+
+The present version of the package uses Gassian statistics and data has ton be, if needed, adequately rebinned. A future version "might" offer analyses based on Poissonian statistics.
+
+The packahe gas been used for analyses included in, e.g., [Brivio et al. (2025)](https://ui.adsabs.harvard.edu/abs/2025A%26A...695A.239B/abstract)
+
+
+
+### A toy session
+
 
 The instruments currently covered can be obtained with:
 
@@ -81,7 +90,7 @@ IgnoreChannels(XRTdt,[0:30,1000:2047])
 ```
 
 
-And, data must often be rebinned to make the analysis based on a Gaussian likelihood meaningful. This can be achieved easily choosing the minium S/N per bin with, e.g.:
+And, data must often be rebinned to make the analysis based on a Gaussian likelihood meaningful. This can be achieved easily choosing the minimum S/N per bin with, e.g.:
 
 ```julia
 RebinData(XRTdt,minSN=7)
@@ -89,7 +98,7 @@ RebinData(XRTdt,minSN=7)
 
 In case no rebinning is needed the step should be executed anyway with 'minSN=0'.
 
-Once a rebinning schema has been defined, there are more input data to be properly rebinned:
+Once a rebinning schema has been defined, the ancillary data should also be properly rebinned:
 
 ```julia
 RebinAncillaryData(XRTdt)
@@ -109,7 +118,7 @@ GenResponseMatrix(XRTdt)
 
 At this point, we need to define a model for our data. This can be expressed by regular `Julia` syntax, although the function 
 arguments should be set up to allow JSPEC to convolve the function results with the response matrices and be able to compare the
- odel prediction with the observation.
+ model prediction with the observation.
  
 For instance, with XRT and optical data, it might be something as a simple power-law with local optical and X-ray extinction and absorption:
 
