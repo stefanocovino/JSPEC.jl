@@ -4,7 +4,7 @@
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://stefanocovino.github.io/JSPEC.jl/dev/)
 [![Build Status](https://github.com/stefanocovino/JSPEC.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/stefanocovino/JSPEC.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
-This is a package to allow to read and analyse spectra obtained from multi-channel instruments (e.g., Swift-XRT) with data from any other source (e.g. optical/NIR observations). Altough several features are in common, no attempt to mimic the full funtionalities offered by [XSPEC](https://heasarc.gsfc.nasa.gov/xanadu/xspec/) was tried. In addition, at present, only fits with a Gaussian likelihod are implemented. Fits in a full Poissonian regime will possibly be included in a future version (or never...). 
+This is a package to allow to read and analyse spectra obtained from multi-channel instruments (e.g., Swift-XRT) with data from any other source (e.g. optical/NIR observations). Altough several features are in common, no attempt to mimic the full funtionalities offered by [XSPEC](https://heasarc.gsfc.nasa.gov/xanadu/xspec/) was tried. In addition, at present, only fits with a Gaussian likelihood are implemented. Fits in a full Poissonian regime will possibly be included in a future version (or never...). 
 
 
 ## Installation
@@ -39,7 +39,7 @@ No attept has been tried, on purpose, to mimic the simplified XSPEC syntax to cr
 
 The present version of the package uses Gassian statistics and data has ton be, if needed, adequately rebinned. A future version "might" offer analyses based on Poissonian statistics.
 
-The packahe gas been used for analyses included in, e.g., [Brivio et al. (2025)](https://ui.adsabs.harvard.edu/abs/2025A%26A...695A.239B/abstract)
+The package has been used for analyses included in, e.g., [Brivio et al. (2025)](https://ui.adsabs.harvard.edu/abs/2025A%26A...695A.239B/abstract).
 
 
 
