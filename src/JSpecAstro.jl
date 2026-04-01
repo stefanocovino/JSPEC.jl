@@ -490,7 +490,11 @@ function ImportData(ds::Dict; rmffile::String="", arffile::String="", srcfile::S
                 #
                 cols = []
                 for i in 1:nrow(ds["RMF"])
-                    vtrx = zeros(headr["TLMAX4"]+1)
+                    if haskey(headr,"TLMAX4")
+                        vtrx = zeros(headr["TLMAX4"]+1)
+                    else
+                        vtrx = zeros(headr["DETCHANS"])
+                    end
                     idx = 1
                     for g in 1:ds["RMF"][i,:N_GRP]
                         chstart = fch[i][g]
