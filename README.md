@@ -3,7 +3,7 @@
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://stefanocovino.github.io/JSpecAstro.jl/stable/)
 [![Build Status](https://github.com/stefanocovino/JSpecAstro.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/stefanocovino/JSpecAstro.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
-This is a package to allow to read and analyse spectra obtained from multi-channel instruments (e.g., Swift-XRT) with data from any other source (e.g. optical/NIR observations). Altough several features are in common, no attempt to mimic the full funtionalities offered by [XSPEC](https://heasarc.gsfc.nasa.gov/xanadu/xspec/) was tried. In addition, at present, only fits with a Gaussian likelihood are implemented. Fits in a full Poissonian regime will possibly be included in a future version (or never...). 
+This is a package to allow to read and analyse spectra obtained from multi-channel instruments (e.g., Swift-XRT) with data from any other source (e.g. optical/NIR, VHE observations). Altough several features are in common, no attempt to mimic the full funtionalities offered by [XSPEC](https://heasarc.gsfc.nasa.gov/xanadu/xspec/) was tried. In addition, at present, only fits with a Gaussian likelihood are implemented. Fits in a full Poissonian regime will possibly be included in a future version (or never...).
 
 
 ## Installation
@@ -25,7 +25,7 @@ will install this package, with the latter enabled once (if ever) the package is
 
 ### Instruments
 
-JSpecAstro currently handles data from [Swift-BAT](https://science.nasa.gov/mission/swift/), [Swift-XRT](https://science.nasa.gov/mission/swift/), [SVOM-MXT](https://www.svom.eu/en/the-svom-mission/), [NuSTAR-FPM](https://heasarc.gsfc.nasa.gov/docs/nustar/), [XMM-EMOS](https://www.cosmos.esa.int/web/xmm-newton) and [XMM-EPN](https://www.cosmos.esa.int/web/xmm-newton).
+JSpecAstro currently handles data from [Swift-BAT](https://science.nasa.gov/mission/swift/), [Swift-XRT](https://science.nasa.gov/mission/swift/), [SVOM-MXT](https://www.svom.eu/en/the-svom-mission/), [NuSTAR-FPM](https://heasarc.gsfc.nasa.gov/docs/nustar/), [XMM-EMOS](https://www.cosmos.esa.int/web/xmm-newton) and [XMM-EPN](https://www.cosmos.esa.int/web/xmm-newton). If you like to add a new instrument please feel free to contact me.
 
 
 ### Documentation and examples
@@ -40,13 +40,13 @@ If you are interested in similar (or better) capabilities you may also check the
 
 ## Getting Started
 
-The purpose of the package is to provide tools to mode data from multi-channel instruments togeter, if needed, with data from any other surce. The package compute the needed response matrices that can then used for creating models, carry out fits, etc.
+The purpose of the package is to provide tools to model data from multi-channel instruments together, if needed, with data from any other source. The package compute the needed response matrices that can then used for creating models, carry out fits, etc.
 
 No attempt has been tried, on purpose, to mimic the simplified XSPEC syntax to create models, etc. Therefore models, etc. will be coded according to plain Julia syntax.
 
 The present version of the package uses Gaussian statistics and data has to be, if needed, adequately rebinned. A future version "might" offer analyses based on Poissonian statistics.
 
-The package has been used for real scientific analyses as in, e.g., [Brivio et al. (2025)](https://ui.adsabs.harvard.edu/abs/2025A%26A...695A.239B/abstract).
+The package has been used for real scientific analyses as in, e.g., [Brivio et al. (2025)](https://ui.adsabs.harvard.edu/abs/2025A%26A...695A.239B/abstract) and other papers.
 
 
 
@@ -59,7 +59,7 @@ The instruments currently covered can be obtained with:
 GetKnownInstruments()
 ```
 
-Ad the first step is to create a new dataset. For instance, assuming we want to model 'Swift-XRT' data and data from an optical telescope, we might write:
+The first step is to create a new dataset. For instance, assuming we want to model 'Swift-XRT' data and data from an optical telescope, we might write:
 
 ```julia
 XRTdt = CreateDataSet("XRTdata","Swift-XRT")
@@ -90,11 +90,12 @@ or:
 PlotRaw(Optdt,ylbl=L"Photons s$^{-1}$ cm$^{-2}$ keV$^{-1}$")
 ```
 
-Often, for multi-channel instruments, channels can (or need to be) ignored. This can be achieved with, e.g. (please be aware that the first channels is the 0-channel, at variance with the julia convention):
+Often, for multi-channel instruments, channels can (or need to be) ignored. This can be achieved with, e.g.
 
 ```julia
 IgnoreChannels(XRTdt,[0:30,1000:2047])
 ```
+Please be aware that, at variance with the julia convention, the first channels is the 0-channel:
 
 
 And, data must often be rebinned to make the analysis based on a Gaussian likelihood meaningful. This can be achieved easily choosing the minimum S/N per bin with, e.g.:
@@ -123,9 +124,7 @@ And, finally, a response matrix properly rebinned following the rebin schema ide
 GenResponseMatrix(XRTdt)
 ```
 
-At this point, we need to define a model for our data. This can be expressed by regular `Julia` syntax, although the function 
-arguments should be set up to allow JSpecAstro to convolve the function results with the response matrices and be able to compare the
- model prediction with the observation.
+At this point, we need to define a model for our data. This can be expressed by regular `Julia` syntax, although the function arguments should be set up to allow JSpecAstro to convolve the function results with the response matrices and be able to compare the model prediction with the observation.
  
 For instance, with XRT and optical data, it might be something as a simple power-law with local optical and X-ray extinction and absorption:
 
@@ -147,7 +146,7 @@ Vectors with the observatins, uncertainties and input energies for all the impor
 obs,eobs,engy = GenFullObsData([Optdt,XRTdt])
 ```
 
-Finally, having defined a theoretical model, we can convolve it with the various, possiby rebinned, responce matrices of the imported datasets to obtain model predictions to be compared with the observed data. This can be obtained by means of the `JSpecAstroFunc` function as:
+Finally, having defined a theoretical model, we can convolve it with the various, possiby rebinned, response matrices for the imported datasets to obtain model predictions to be compared with the observed data. This can be obtained by means of the `JSpecAstroFunc` function as:
 
 ```julia
 modpreds = JSpecAstroFunc(pars,[Optdt,XRTdt],MyModel)
@@ -173,4 +172,4 @@ For instance, a [`Turing`](https://turinglang.org/) model might look like:
 model = SEDModel(obs,eobs);
 ```
 
-And, having defined a model you can get the maximum likelihod, carry out a sampling, etc.
+And, having defined a model you can compute the maximum likelihod, sampling the posterior distribution, etc.
